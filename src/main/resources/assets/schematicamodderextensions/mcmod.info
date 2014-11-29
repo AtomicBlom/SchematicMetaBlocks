@@ -1,0 +1,18 @@
+[
+	{
+		"modid": "schematicamodderextensions",
+		"name": "Schematica Modder Extensions",
+		"description": "Tools for making schematica more useful for modders",
+		"version": "0.0.1",
+		"credits": "Created by AtomicBlom",
+		"mcversion": "1.7",
+		"url": "http://github.com/SchematicaModderExtensions",
+		"updateUrl": "",
+		"authors": [ "AtomicBlom" ],
+		"parent":"",
+		"screenshots": [],
+		"dependencies": [
+			"mod_MinecraftForge"
+		]
+	}
+]
