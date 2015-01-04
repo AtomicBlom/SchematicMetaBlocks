@@ -1,7 +1,7 @@
 [
 	{
-		"modid": "schematicamodderextensions",
-		"name": "Schematica Modder Extensions",
+		"modid": "schematica4worldgen",
+		"name": "Schematica Worldgen tools",
 		"description": "Tools for making schematica more useful for modders",
 		"version": "0.0.1",
 		"credits": "Created by AtomicBlom",
