@@ -1,13 +1,11 @@
 package net.binaryvibrance.schematica4worldgen;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.binaryvibrance.schematica4worldgen.library.ModBlock;
 import net.binaryvibrance.schematica4worldgen.library.ModItem;
@@ -58,7 +56,7 @@ public class TheMod
 
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
-		MinecraftForge.EVENT_BUS.register(InsideBlockProcessor.Instance);
+		MinecraftForge.EVENT_BUS.register(InteriorProcessor.Instance);
 	}
 
 	@NetworkCheckHandler

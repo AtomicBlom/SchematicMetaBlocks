@@ -21,6 +21,7 @@ import net.binaryvibrance.schematica4worldgen.TheMod;
 import net.binaryvibrance.schematica4worldgen.blocks.ExplicitAirBlock;
 import net.binaryvibrance.schematica4worldgen.blocks.InteriorAirMarker;
 import net.binaryvibrance.schematica4worldgen.blocks.ImplicitAirBlock;
+import net.binaryvibrance.schematica4worldgen.tileentity.InteriorAirMarkerTileEntity;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
 @GameRegistry.ObjectHolder(TheMod.MOD_ID)
@@ -41,8 +42,7 @@ public final class ModBlock
 
     public static void registerTileEntities()
     {
-        /*GameRegistry.registerTileEntity(CupolaTE.class, getTEName(CupolaBlock.NAME));
-        GameRegistry.registerTileEntity(PlotoniumChestTE.class, getTEName(PlotoniumChest.NAME));*/
+        GameRegistry.registerTileEntity(InteriorAirMarkerTileEntity.class, getTEName(blockInteriorAirMarker.NAME));
     }
 
     private static String getTEName(String name) { return "tile." + name;}
