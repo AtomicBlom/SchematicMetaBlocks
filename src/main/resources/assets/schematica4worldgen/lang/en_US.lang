@@ -1,0 +1,5 @@
+tile.schematica4worldgen:blockImplicitAir.name=Implicit Air
+tile.schematica4worldgen:blockExplicitAir.name=Explicit Air
+tile.schematica4worldgen:blockInteriorAirMarker.name=Interior Air Marker
+# Creative Tabs
+itemGroup.schematica4worldgen=Schematica for WorldGen

@@ -2,6 +2,7 @@ package net.binaryvibrance.schematica4worldgen;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -10,8 +11,10 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.binaryvibrance.schematica4worldgen.library.ModBlock;
 import net.binaryvibrance.schematica4worldgen.library.ModItem;
+import net.binaryvibrance.schematica4worldgen.proxy.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
 import java.util.Map;
 
 @Mod(modid = TheMod.MOD_ID, name = TheMod.MOD_NAME, version = TheMod.MOD_VERSION)
@@ -24,6 +27,9 @@ public class TheMod
 
 	@Mod.Instance(TheMod.MOD_ID)
 	public static TheMod instance;
+
+	@SidedProxy(clientSide="net.binaryvibrance.schematica4worldgen.proxy.ClientProxy", serverSide="net.binaryvibrance.schematica4worldgen.proxy.CommonProxy")
+	public static CommonProxy proxy;
 
 	@SuppressWarnings("AnonymousInnerClass")
 	public static final CreativeTabs CREATIVE_TAB = new CreativeTabs(MOD_ID.toLowerCase())
@@ -45,12 +51,14 @@ public class TheMod
 	@Mod.EventHandler
 	public void onFMLInitialization(FMLInitializationEvent event)
 	{
+
 		ModBlock.registerTileEntities();
+		proxy.setCustomRenderers();
 	}
 
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
-
+		MinecraftForge.EVENT_BUS.register(InsideBlockProcessor.Instance);
 	}
 
 	@NetworkCheckHandler

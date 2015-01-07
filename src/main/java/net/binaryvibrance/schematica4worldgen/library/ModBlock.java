@@ -18,8 +18,9 @@ package net.binaryvibrance.schematica4worldgen.library;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.binaryvibrance.schematica4worldgen.TheMod;
-import net.binaryvibrance.schematica4worldgen.blocks.InsideBlock;
-import net.binaryvibrance.schematica4worldgen.blocks.S4WGBlock;
+import net.binaryvibrance.schematica4worldgen.blocks.ExplicitAirBlock;
+import net.binaryvibrance.schematica4worldgen.blocks.InteriorAirMarker;
+import net.binaryvibrance.schematica4worldgen.blocks.ImplicitAirBlock;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
 @GameRegistry.ObjectHolder(TheMod.MOD_ID)
@@ -29,7 +30,9 @@ public final class ModBlock
     // * NOTE: @GameRegistry.ObjectHolder requires these fields to have the same name as the unlocalized name of the
     // *       object.
     // *
-    public static final InsideBlock blockInside = new InsideBlock();
+    public static final InteriorAirMarker blockInteriorAirMarker = new InteriorAirMarker();
+    public static final ImplicitAirBlock blockImplicitAir = new ImplicitAirBlock();
+    public static final ExplicitAirBlock blockExplicitAir = new ExplicitAirBlock();
 
     private ModBlock()
     {
@@ -46,6 +49,9 @@ public final class ModBlock
 
     public static void init()
     {
-        GameRegistry.registerBlock(blockInside, blockInside.NAME);
+
+        GameRegistry.registerBlock(blockInteriorAirMarker, blockInteriorAirMarker.NAME);
+        GameRegistry.registerBlock(blockImplicitAir, blockImplicitAir.NAME);
+        GameRegistry.registerBlock(blockExplicitAir, blockExplicitAir.NAME);
     }
 }

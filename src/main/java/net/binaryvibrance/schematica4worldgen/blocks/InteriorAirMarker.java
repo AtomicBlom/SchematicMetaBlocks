@@ -2,11 +2,11 @@ package net.binaryvibrance.schematica4worldgen.blocks;
 
 import net.minecraft.block.material.Material;
 
-public class InsideBlock extends S4WGBlock
+public class InteriorAirMarker extends S4WGBlock
 {
-    public static final String NAME = "Inside";
+    public static final String NAME = "blockInteriorAirMarker";
 
-    public InsideBlock()
+    public InteriorAirMarker()
     {
         super(Material.glass);
         this.setBlockName(NAME);
