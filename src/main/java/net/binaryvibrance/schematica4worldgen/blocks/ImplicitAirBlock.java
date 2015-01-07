@@ -76,7 +76,7 @@ public class ImplicitAirBlock extends S4WGBlock
     {
         ForgeDirection direction = ForgeDirection.getOrientation(side);
         Block b = world.getBlock(x + direction.offsetX, y + direction.offsetY, z + direction.offsetZ);
-        if (b instanceof ImplicitAirBlock) {
+        if (b instanceof ImplicitAirBlock || b instanceof InteriorAirMarker) {
             return null;
         }
 

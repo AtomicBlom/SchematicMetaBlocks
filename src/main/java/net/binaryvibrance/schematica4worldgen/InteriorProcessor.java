@@ -18,22 +18,27 @@ import java.util.Queue;
 public class InteriorProcessor
 {
     public static InteriorProcessor Instance = new InteriorProcessor();
-    private InteriorProcessor() {
+
+    private InteriorProcessor()
+    {
 
     }
 
     @Mod.EventHandler
-    public void onChunkLoaded(ChunkEvent.Load chunkLoadEvent) {
+    public void onChunkLoaded(ChunkEvent.Load chunkLoadEvent)
+    {
 
     }
 
     @Mod.EventHandler
-    public void onBlockChanged(BlockEvent.PlaceEvent blockPlacedEvent) {
+    public void onBlockChanged(BlockEvent.PlaceEvent blockPlacedEvent)
+    {
         World world = blockPlacedEvent.blockSnapshot.world;
         Chunk c = world.getChunkFromBlockCoords(blockPlacedEvent.x, blockPlacedEvent.z);
     }
 
-    public void processChunk(World world, int chunkX, int chunkZ) {
+    public void processChunk(World world, int chunkX, int chunkZ)
+    {
         ChunkToProcess chunkToProcess = new ChunkToProcess(world, chunkX, chunkZ);
         processChunk(chunkToProcess);
     }
@@ -46,9 +51,9 @@ public class InteriorProcessor
         boolean[] processed = new boolean[16 * 16 * worldHeight];
         Queue<Integer> blocksToProcess = new LinkedList<Integer>();
 
-        for(Object obj : chunk.chunkTileEntityMap.values())
+        for (Object obj : chunk.chunkTileEntityMap.values())
         {
-            TileEntity entity = (TileEntity)obj;
+            TileEntity entity = (TileEntity) obj;
             if (entity instanceof InteriorAirMarkerTileEntity)
             {
                 blocksToProcess.add(createIndex(entity.xCoord & 15, entity.yCoord, entity.zCoord & 15));
@@ -56,7 +61,8 @@ public class InteriorProcessor
         }
 
         int processedBlocks = 0;
-        while (!blocksToProcess.isEmpty()) {
+        while (!blocksToProcess.isEmpty())
+        {
             processedBlocks++;
             int blockToProcess = blocksToProcess.poll();
             int x = decodeX(blockToProcess);
@@ -73,7 +79,8 @@ public class InteriorProcessor
 
             Logger.info("Processing block %d,%d,%d (%d/%d)", chunkXStart + x, y, chunkZStart + z, processedBlocks, processed.length);
 
-            for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+            for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
+            {
                 int neighbourX = x + d.offsetX;
                 int neighbourY = y + d.offsetY;
                 int neighbourZ = z + d.offsetZ;
@@ -96,30 +103,34 @@ public class InteriorProcessor
         }
     }
 
-    private static int createIndex(int x, int y, int z) {
-
-        //yyyyyyyyzzzzxxxx
+    private static int createIndex(int x, int y, int z)
+    {
         return y << 8 | z << 4 | x;
     }
 
-    private static int decodeX(int index) {
+    private static int decodeX(int index)
+    {
         return index & 15;
     }
 
-    private static int decodeZ(int index) {
+    private static int decodeZ(int index)
+    {
         return (index >> 4) & 15;
     }
 
-    private static int decodeY(int index) {
+    private static int decodeY(int index)
+    {
         return (index >> 8);
     }
 
-    private static class ChunkToProcess {
+    private static class ChunkToProcess
+    {
         private final World world;
         private final int x;
         private final int z;
 
-        public ChunkToProcess(World world, int x, int z) {
+        public ChunkToProcess(World world, int x, int z)
+        {
             this.world = world;
             this.x = x;
             this.z = z;
