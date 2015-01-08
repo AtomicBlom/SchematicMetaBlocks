@@ -1,4 +1,4 @@
-package net.binaryvibrance.schematica4worldgen.proxy;
+package net.binaryvibrance.schematicmetablocks.proxy;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import net.minecraft.block.Block;
@@ -8,7 +8,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class InsideMetadataBlockRenderer implements ISimpleBlockRenderingHandler
+public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
 {
 
     @Override

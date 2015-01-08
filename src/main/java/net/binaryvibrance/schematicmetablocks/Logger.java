@@ -14,7 +14,7 @@
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
 
-package net.binaryvibrance.schematica4worldgen;
+package net.binaryvibrance.schematicmetablocks;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

@@ -1,4 +1,4 @@
-package net.binaryvibrance.schematica4worldgen.proxy;
+package net.binaryvibrance.schematicmetablocks.proxy;
 
 public class CommonProxy
 {

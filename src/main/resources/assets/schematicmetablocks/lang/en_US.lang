@@ -1,0 +1,5 @@
+tile.schematicmetablocks:blockImplicitAir.name=Implicit Air
+tile.schematicmetablocks:blockExplicitAir.name=Explicit Air
+tile.schematicmetablocks:blockInteriorAirMarker.name=Interior Air Marker
+# Creative Tabs
+itemGroup.schematicmetablocks=Schematic Meta-Blocks

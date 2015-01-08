@@ -14,11 +14,11 @@
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
 
-package net.binaryvibrance.schematica4worldgen.library;
+package net.binaryvibrance.schematicmetablocks.library;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import net.binaryvibrance.schematica4worldgen.TheMod;
-import net.binaryvibrance.schematica4worldgen.items.ItemFiddler;
+import net.binaryvibrance.schematicmetablocks.TheMod;
+import net.binaryvibrance.schematicmetablocks.items.ItemFiddler;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
 @GameRegistry.ObjectHolder(TheMod.MOD_ID)

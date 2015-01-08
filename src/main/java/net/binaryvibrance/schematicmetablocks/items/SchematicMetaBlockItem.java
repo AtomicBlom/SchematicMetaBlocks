@@ -14,18 +14,18 @@
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
 
-package net.binaryvibrance.schematica4worldgen.items;
+package net.binaryvibrance.schematicmetablocks.items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.binaryvibrance.schematica4worldgen.TheMod;
+import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public class S4WGItem extends Item
+public class SchematicMetaBlockItem extends Item
 {
-    public S4WGItem()
+    public SchematicMetaBlockItem()
     {
         setCreativeTab(TheMod.CREATIVE_TAB);
     }

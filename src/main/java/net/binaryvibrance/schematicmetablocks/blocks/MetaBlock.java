@@ -1,22 +1,21 @@
-package net.binaryvibrance.schematica4worldgen.blocks;
+package net.binaryvibrance.schematicmetablocks.blocks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.binaryvibrance.schematica4worldgen.TheMod;
+import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.item.ItemBlock;
 
-public class S4WGBlock extends Block
+public class MetaBlock extends Block
 {
-    protected S4WGBlock(Material material, boolean addToCreativeTab)
+    protected MetaBlock(Material material, boolean addToCreativeTab)
     {
         super(material);
         if (addToCreativeTab) setCreativeTab(TheMod.CREATIVE_TAB);
     }
 
-    protected S4WGBlock(Material material) { this(material, true); }
+    protected MetaBlock(Material material) { this(material, true); }
 
     @SuppressWarnings("WeakerAccess")
     protected static String getUnwrappedUnlocalizedName(String unlocalizedName)

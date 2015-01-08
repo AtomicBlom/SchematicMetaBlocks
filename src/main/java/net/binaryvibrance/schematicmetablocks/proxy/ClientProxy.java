@@ -1,4 +1,4 @@
-package net.binaryvibrance.schematica4worldgen.proxy;
+package net.binaryvibrance.schematicmetablocks.proxy;
 
 import cpw.mods.fml.client.registry.RenderingRegistry;
 
@@ -11,7 +11,7 @@ public class ClientProxy extends CommonProxy
     public void setCustomRenderers()
     {
         insideMetadataBlockRendererId = RenderingRegistry.getNextAvailableRenderId();
-        RenderingRegistry.registerBlockHandler(new InsideMetadataBlockRenderer());
+        RenderingRegistry.registerBlockHandler(new InvertedMetaBlockRenderer());
     }
 
 }

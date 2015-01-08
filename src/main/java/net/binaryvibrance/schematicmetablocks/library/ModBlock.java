@@ -14,14 +14,14 @@
  * this program; if not, see <http://www.gnu.org/licenses>.
  */
 
-package net.binaryvibrance.schematica4worldgen.library;
+package net.binaryvibrance.schematicmetablocks.library;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import net.binaryvibrance.schematica4worldgen.TheMod;
-import net.binaryvibrance.schematica4worldgen.blocks.ExplicitAirBlock;
-import net.binaryvibrance.schematica4worldgen.blocks.InteriorAirMarker;
-import net.binaryvibrance.schematica4worldgen.blocks.ImplicitAirBlock;
-import net.binaryvibrance.schematica4worldgen.tileentity.InteriorAirMarkerTileEntity;
+import net.binaryvibrance.schematicmetablocks.TheMod;
+import net.binaryvibrance.schematicmetablocks.blocks.ExplicitAirBlock;
+import net.binaryvibrance.schematicmetablocks.blocks.InteriorAirMarker;
+import net.binaryvibrance.schematicmetablocks.blocks.ImplicitAirBlock;
+import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
 @GameRegistry.ObjectHolder(TheMod.MOD_ID)

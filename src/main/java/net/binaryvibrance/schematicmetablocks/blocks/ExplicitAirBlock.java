@@ -1,18 +1,13 @@
-package net.binaryvibrance.schematica4worldgen.blocks;
+package net.binaryvibrance.schematicmetablocks.blocks;
 
-import net.binaryvibrance.schematica4worldgen.proxy.ClientProxy;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import java.util.List;
 
-public class ExplicitAirBlock extends S4WGBlock
+public class ExplicitAirBlock extends MetaBlock
 {
     public static final String NAME = "blockExplicitAir";
 
