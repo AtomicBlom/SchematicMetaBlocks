@@ -55,6 +55,7 @@ public class TheMod
 		proxy.setCustomRenderers();
 		MinecraftForge.EVENT_BUS.register(InteriorProcessor.Instance);
 		FMLCommonHandler.instance().bus().register(InteriorProcessor.Instance);
+		MinecraftForge.EVENT_BUS.register(SchematicSaveListener.Instance);
 	}
 
 	@Mod.EventHandler

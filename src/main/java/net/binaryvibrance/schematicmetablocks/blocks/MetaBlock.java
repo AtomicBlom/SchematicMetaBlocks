@@ -18,7 +18,7 @@ public class MetaBlock extends Block
     protected MetaBlock(Material material) { this(material, true); }
 
     @SuppressWarnings("WeakerAccess")
-    protected static String getUnwrappedUnlocalizedName(String unlocalizedName)
+    public static String getUnwrappedUnlocalizedName(String unlocalizedName)
     {
         return unlocalizedName.substring(unlocalizedName.indexOf('.') + 1);
     }

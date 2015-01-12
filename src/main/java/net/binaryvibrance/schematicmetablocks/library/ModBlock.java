@@ -21,6 +21,7 @@ import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.blocks.ExplicitAirBlock;
 import net.binaryvibrance.schematicmetablocks.blocks.InteriorAirMarker;
 import net.binaryvibrance.schematicmetablocks.blocks.ImplicitAirBlock;
+import net.binaryvibrance.schematicmetablocks.blocks.NullBlock;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
@@ -34,6 +35,7 @@ public final class ModBlock
     public static final InteriorAirMarker blockInteriorAirMarker = new InteriorAirMarker();
     public static final ImplicitAirBlock blockImplicitAir = new ImplicitAirBlock();
     public static final ExplicitAirBlock blockExplicitAir = new ExplicitAirBlock();
+    public static final NullBlock blockNull = new NullBlock();
 
     private ModBlock()
     {
@@ -53,5 +55,6 @@ public final class ModBlock
         GameRegistry.registerBlock(blockInteriorAirMarker, blockInteriorAirMarker.NAME);
         GameRegistry.registerBlock(blockImplicitAir, blockImplicitAir.NAME);
         GameRegistry.registerBlock(blockExplicitAir, blockExplicitAir.NAME);
+        GameRegistry.registerBlock(blockNull, blockNull.NAME);
     }
 }
