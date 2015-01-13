@@ -1,8 +1,9 @@
 package net.binaryvibrance.schematicmetablocks;
 
+import com.github.lunatrius.schematica.api.DuplicateMappingException;
 import com.github.lunatrius.schematica.api.ISchematic;
-import com.github.lunatrius.schematica.api.PostSchematicCaptureEvent;
-import com.github.lunatrius.schematica.api.PreSchematicSaveEvent;
+import com.github.lunatrius.schematica.api.event.PostSchematicCaptureEvent;
+import com.github.lunatrius.schematica.api.event.PreSchematicSaveEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.binaryvibrance.schematicmetablocks.blocks.ExplicitAirBlock;
 import net.binaryvibrance.schematicmetablocks.blocks.ImplicitAirBlock;
@@ -60,14 +61,15 @@ public class SchematicSaveListener
 
     @SubscribeEvent
     public void OnSchematicSaving(PreSchematicSaveEvent event) {
-        final NBTTagCompound extendedMetadata = event.getExtendedMetadata();
+        final NBTTagCompound extendedMetadata = event.extendedMetadata;
         extendedMetadata.setString("SchematicName", "I dunno, I don't care");
-        final Map<String, Short> mappings = event.getMappings();
+
         final String nullBlockIdentifier = MetaBlock.getUnwrappedUnlocalizedName(ModBlock.blockNull.getUnlocalizedName());
-        Short nullBlockId = mappings.get(nullBlockIdentifier);
-        if (nullBlockId != null) {
-            mappings.remove(nullBlockIdentifier);
-            mappings.put("null", nullBlockId);
+        try
+        {
+            event.replaceMapping(nullBlockIdentifier, "null");
+        } catch (DuplicateMappingException ex) {
+            Logger.warning("Got a duplicate mapping, something must not have been replaced correctly.");
         }
     }
 }
