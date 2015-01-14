@@ -1,7 +1,7 @@
 package net.binaryvibrance.schematicmetablocks;
 
-import com.github.lunatrius.schematica.api.DuplicateMappingException;
 import com.github.lunatrius.schematica.api.ISchematic;
+import com.github.lunatrius.schematica.api.event.DuplicateMappingException;
 import com.github.lunatrius.schematica.api.event.PostSchematicCaptureEvent;
 import com.github.lunatrius.schematica.api.event.PreSchematicSaveEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -27,7 +27,7 @@ public class SchematicSaveListener
     @SubscribeEvent
     public void OnSchematicCaptured(PostSchematicCaptureEvent event) {
         Logger.info("Schematic captured, changing weather pattern.");
-        ISchematic schematic = event.getSchematic();
+        ISchematic schematic = event.schematic;
         int width = schematic.getWidth();
         int height = schematic.getHeight();
         int length = schematic.getLength();
