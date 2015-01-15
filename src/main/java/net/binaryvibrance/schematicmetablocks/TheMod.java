@@ -11,6 +11,7 @@ import cpw.mods.fml.relauncher.Side;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.library.ModItem;
 import net.binaryvibrance.schematicmetablocks.proxy.CommonProxy;
+import net.binaryvibrance.schematicmetablocks.schematic.LoadSchematicCommand;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class TheMod
 {
 	public static final String MOD_ID = "schematicmetablocks";
-	public static final String MOD_NAME = "Schematica Meta-Blocks";
+	public static final String MOD_NAME = "Schematic Meta-Blocks";
 	public static final String MOD_VERSION = "@MOD_VERSION@";
 	public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ':';
 
@@ -60,7 +61,7 @@ public class TheMod
 
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
-
+		event.registerServerCommand(new LoadSchematicCommand());
 	}
 
 	@NetworkCheckHandler
