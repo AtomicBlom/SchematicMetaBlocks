@@ -58,7 +58,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     compile group: 'com.github.lunatrius', name: 'Schematica', version: "1.7.10-1.7.5.110", classifier: 'api'
-
+    runtime group: 'com.github.lunatrius', name: 'Schematica', version: "1.7.10-1.7.5.110", classifier: 'dev'
+    runtime group: 'com.github.lunatrius', name: 'LunatriusCore', version: "1.7.10-1.1.2.20", classifier: 'dev'
 }
 
 processResources
