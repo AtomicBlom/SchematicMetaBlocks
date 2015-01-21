@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.lwjgl.opengl.GL11;
 
 public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
 {
@@ -16,7 +17,13 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
     public void renderInventoryBlock(Block block, int metadata, int modelID,
                                      RenderBlocks renderer)
     {
+        Tessellator tessellator = Tessellator.instance;
+        GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+        tessellator.startDrawingQuads();
+        renderThing(0, 0, 0, tessellator);
 
+        tessellator.draw();
+        GL11.glTranslatef(0.5F, 0.5F, 0.5F);
     }
 
     @Override
@@ -36,76 +43,7 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
         Tessellator tessellator = Tessellator.instance;
 
         if (block instanceof InteriorAirMarker) {
-            double pedestalHeight = 0.25;
-
-            final Block blockFromName = Block.getBlockFromName("minecraft:stone");
-            renderIcon = blockFromName.getIcon(0, 0);
-
-            tessellator.addVertexWithUV(
-                    xPos, yPos, zPos,
-                    renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(0));
-            tessellator.addVertexWithUV(
-                    xPos + pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                    renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4) );
-            tessellator.addVertexWithUV(
-                    xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                    renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4));
-            tessellator.addVertexWithUV(
-                    xPos + 1, yPos, zPos,
-                    renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(0));
-
-            tessellator.addVertexWithUV(
-                    xPos, yPos, zPos,
-                    renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(0));
-            tessellator.addVertexWithUV(
-                    xPos, yPos, zPos + 1,
-                    renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(16));
-            tessellator.addVertexWithUV(
-                    xPos + pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
-                    renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12));
-            tessellator.addVertexWithUV(
-                    xPos + pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                    renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4) );
-
-            tessellator.addVertexWithUV(
-                    xPos, yPos, zPos + 1,
-                    renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(16));
-            tessellator.addVertexWithUV(
-                    xPos + 1, yPos, zPos + 1,
-                    renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(16));
-            tessellator.addVertexWithUV(
-                    xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
-                    renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(12));
-            tessellator.addVertexWithUV(
-                    xPos + pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
-                    renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12) );
-
-            tessellator.addVertexWithUV(
-                    xPos + 1, yPos, zPos,
-                    renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(0));
-            tessellator.addVertexWithUV(
-                    xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                    renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4) );
-            tessellator.addVertexWithUV(
-                    xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
-                    renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(12));
-            tessellator.addVertexWithUV(
-                    xPos + 1, yPos, zPos + 1,
-                    renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(16));
-
-            tessellator.addVertexWithUV(
-                    xPos + pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                    renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4));
-            tessellator.addVertexWithUV(
-                    xPos + pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
-                    renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12) );
-
-            tessellator.addVertexWithUV(
-                    xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
-                    renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(12));
-            tessellator.addVertexWithUV(
-                    xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                    renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4));
+            renderThing(xPos, yPos, zPos, tessellator);
         }
 
         tessellator.setBrightness(240);
@@ -194,10 +132,85 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
         return true;
     }
 
+    private void renderThing(double xPos, double yPos, double zPos, Tessellator tessellator)
+    {
+        final IIcon renderIcon;
+        double pedestalHeight = 0.25;
+
+        final Block blockFromName = Block.getBlockFromName("minecraft:stone");
+        renderIcon = blockFromName.getIcon(0, 0);
+
+        tessellator.addVertexWithUV(
+                xPos, yPos, zPos,
+                renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(0));
+        tessellator.addVertexWithUV(
+                xPos + pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4) );
+        tessellator.addVertexWithUV(
+                xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
+                renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4));
+        tessellator.addVertexWithUV(
+                xPos + 1, yPos, zPos,
+                renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(0));
+
+        tessellator.addVertexWithUV(
+                xPos, yPos, zPos,
+                renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(0));
+        tessellator.addVertexWithUV(
+                xPos, yPos, zPos + 1,
+                renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(16));
+        tessellator.addVertexWithUV(
+                xPos + pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12));
+        tessellator.addVertexWithUV(
+                xPos + pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4) );
+
+        tessellator.addVertexWithUV(
+                xPos, yPos, zPos + 1,
+                renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(16));
+        tessellator.addVertexWithUV(
+                xPos + 1, yPos, zPos + 1,
+                renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(16));
+        tessellator.addVertexWithUV(
+                xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
+                renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(12));
+        tessellator.addVertexWithUV(
+                xPos + pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12) );
+
+        tessellator.addVertexWithUV(
+                xPos + 1, yPos, zPos,
+                renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(0));
+        tessellator.addVertexWithUV(
+                xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
+                renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4) );
+        tessellator.addVertexWithUV(
+                xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
+                renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(12));
+        tessellator.addVertexWithUV(
+                xPos + 1, yPos, zPos + 1,
+                renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(16));
+
+        tessellator.addVertexWithUV(
+                xPos + pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4));
+        tessellator.addVertexWithUV(
+                xPos + pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12) );
+
+        tessellator.addVertexWithUV(
+                xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
+                renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(12));
+        tessellator.addVertexWithUV(
+                xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
+                renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4));
+    }
+
     @Override
     public boolean shouldRender3DInInventory(int modelId)
     {
-        return false;
+        return true;
     }
 
     @Override

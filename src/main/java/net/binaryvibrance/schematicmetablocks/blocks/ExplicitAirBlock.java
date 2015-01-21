@@ -1,10 +1,14 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import java.util.List;
 
 public class ExplicitAirBlock extends MetaBlock
@@ -24,6 +28,16 @@ public class ExplicitAirBlock extends MetaBlock
             super.addCollisionBoxesToList(p_149743_1_, p_149743_2_, p_149743_3_, p_149743_4_, p_149743_5_, p_149743_6_, entity);
         }
 
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side)
+    {
+        Block b = world.getBlock(x, y, z);
+        if (b instanceof ExplicitAirBlock) {
+            return false;
+        }
+        return true;
     }
 
     @Override
