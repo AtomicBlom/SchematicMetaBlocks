@@ -37,7 +37,7 @@ public class TheMod
 		@Override
 		public Item getTabIconItem()
 		{
-			return ModItem.fiddler;
+			return Item.getItemFromBlock(ModBlock.blockExplicitAir);
 		}
 	};
 

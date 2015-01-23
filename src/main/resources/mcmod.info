@@ -3,16 +3,18 @@
 		"modid": "schematicmetablocks",
 		"name": "Schematic Meta-Blocks",
 		"description": "Tools for making schematics more useful for modders",
-		"version": "0.0.1",
-		"credits": "Created by AtomicBlom",
+		"version": "1.0.0",
+		"credits": "Thanks to Lunatrius for Implementing the API in Schematica",
 		"mcversion": "1.7",
-		"url": "http://github.com/SchematicMetaBlocks",
+		"url": "http://github.com/AtomicBlom/SchematicMetaBlocks",
 		"updateUrl": "",
+		"logoFile": "/assets/schematicmetablocks/logo.png",
 		"authors": [ "AtomicBlom" ],
 		"parent":"",
 		"screenshots": [],
 		"dependencies": [
-			"mod_MinecraftForge"
+			"mod_MinecraftForge",
+			"Schematica"
 		]
 	}
 ]
