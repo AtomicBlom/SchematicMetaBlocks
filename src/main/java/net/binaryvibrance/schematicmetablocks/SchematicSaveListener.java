@@ -5,16 +5,16 @@ import com.github.lunatrius.schematica.api.event.DuplicateMappingException;
 import com.github.lunatrius.schematica.api.event.PostSchematicCaptureEvent;
 import com.github.lunatrius.schematica.api.event.PreSchematicSaveEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.binaryvibrance.schematicmetablocks.blocks.ExplicitAirBlock;
-import net.binaryvibrance.schematicmetablocks.blocks.ImplicitAirBlock;
-import net.binaryvibrance.schematicmetablocks.blocks.InteriorAirMarker;
-import net.binaryvibrance.schematicmetablocks.blocks.MetaBlock;
+import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SchematicSaveListener
 {
@@ -24,9 +24,53 @@ public class SchematicSaveListener
 
     }
 
+    class SchematicContext {
+        BlockLocation origin;
+        List<BlockLocation> smbBlocks = new LinkedList<BlockLocation>();
+
+        public void writeTo(NBTTagCompound extendedMetadata)
+        {
+            if (origin != null) {
+
+                extendedMetadata.setTag("Origin", origin.toNBT());
+            }
+        }
+    }
+
+    class BlockLocation {
+        final int x;
+        final int y;
+        final int z;
+
+        final Block block;
+
+        BlockLocation(int x, int y, int z) {
+            this(x, y, z, null);
+        }
+
+        BlockLocation(int x, int y, int z, Block block) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.block = block;
+        }
+
+        public NBTTagCompound toNBT() {
+            NBTTagCompound origin = new NBTTagCompound();
+            origin.setInteger("X", x);
+            origin.setInteger("Y", y);
+            origin.setInteger("Z", z);
+            return origin;
+        }
+    }
+
+    private SchematicContext context;
+
     @SubscribeEvent
     public void OnSchematicCaptured(PostSchematicCaptureEvent event) {
+
         Logger.info("Schematic captured, changing weather pattern.");
+        context = new SchematicContext();
         ISchematic schematic = event.schematic;
         int width = schematic.getWidth();
         int height = schematic.getHeight();
@@ -39,7 +83,11 @@ public class SchematicSaveListener
             for (int x = 0; x < width; ++x) {
                 for (int y = 0; y < height; ++y) {
                     final Block block = schematic.getBlock(x, y, z);
-                    if (block instanceof ImplicitAirBlock || block instanceof ExplicitAirBlock)
+                    if (block instanceof ExplicitAirBlock) {
+                        schematic.setBlock(x, y, z, Blocks.air, 0);
+                        interiorAir++;
+                        //TODO: Add Explicit Air to map of
+                    } else if (block instanceof ImplicitAirBlock)
                     {
                         schematic.setBlock(x, y, z, Blocks.air, 0);
                         interiorAir++;
@@ -50,6 +98,10 @@ public class SchematicSaveListener
                     } else if (block instanceof BlockAir) {
                         schematic.setBlock(x, y, z, ModBlock.blockNull, 0);
                         exteriorAir++;
+                    } else if (block instanceof OriginBlock) {
+                        schematic.setBlock(x, y, z, Blocks.air, 0);
+                        interiorAir++;
+                        context.origin = new BlockLocation(x, y, z);
                     }
                 }
             }
@@ -61,8 +113,10 @@ public class SchematicSaveListener
 
     @SubscribeEvent
     public void OnSchematicSaving(PreSchematicSaveEvent event) {
+
         final NBTTagCompound extendedMetadata = event.extendedMetadata;
         extendedMetadata.setString("SchematicName", "I dunno, I don't care");
+        context.writeTo(extendedMetadata);
 
         final String nullBlockIdentifier = MetaBlock.getUnwrappedUnlocalizedName(ModBlock.blockNull.getUnlocalizedName());
         try
