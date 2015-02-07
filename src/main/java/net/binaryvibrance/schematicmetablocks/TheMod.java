@@ -9,7 +9,6 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
-import net.binaryvibrance.schematicmetablocks.library.ModItem;
 import net.binaryvibrance.schematicmetablocks.proxy.CommonProxy;
 import net.binaryvibrance.schematicmetablocks.schematic.LoadSchematicCommand;
 import net.minecraft.creativetab.CreativeTabs;
