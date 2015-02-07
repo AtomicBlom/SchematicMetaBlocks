@@ -1,8 +1,11 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
@@ -83,5 +86,13 @@ public class NullBlock extends MetaBlock
     public boolean isReplaceable(IBlockAccess world, int x, int y, int z)
     {
         return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister iconRegister)
+    {
+        //Null blocks are never placed into the actual world, so there's no appropriate icon to give them, and using
+        //the default implementation of registerBlockIcons ressults in an exception when loading.
     }
 }
