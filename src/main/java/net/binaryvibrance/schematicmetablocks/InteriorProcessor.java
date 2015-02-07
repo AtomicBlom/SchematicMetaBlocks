@@ -18,6 +18,8 @@ import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 public class InteriorProcessor
 {
@@ -122,7 +124,6 @@ public class InteriorProcessor
             {
 
             }
-
         }
     }
 
@@ -183,6 +184,7 @@ public class InteriorProcessor
     private static class SetBlock implements IJob
     {
 
+        public final int correlationId;
         private final World world;
         private final int x;
         private final int y;
@@ -190,8 +192,9 @@ public class InteriorProcessor
         private final Block block;
         private final int metadata;
 
-        public SetBlock(World world, int x, int y, int z, Block block, int metadata)
+        public SetBlock(int correlationId, World world, int x, int y, int z, Block block, int metadata)
         {
+            this.correlationId = correlationId;
             this.world = world;
             this.x = x;
             this.y = y;
@@ -253,8 +256,29 @@ public class InteriorProcessor
             return (index >> 8);
         }
 
+        AtomicInteger idGenerator = new AtomicInteger();
+
         public void start()
         {
+            final int id = idGenerator.incrementAndGet();
+            final Predicate<IJob> jobIsCorrelated = new Predicate<IJob>()
+            {
+                @Override
+                public boolean test(IJob iJob)
+                {
+                    if (iJob instanceof SetBlock)
+                    {
+                        SetBlock job = (SetBlock) iJob;
+                        if (job.correlationId == id)
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            };
+
             int worldHeight = world.getActualHeight();
             Chunk chunk = world.getChunkFromChunkCoords(_x, _z);
             int[] processed = new int[16 * 16 * worldHeight];
@@ -265,7 +289,7 @@ public class InteriorProcessor
                     for (int y1 = 0; y1 < world.getActualHeight(); ++y1)
                     {
                         final Block block = chunk.getBlock(x1, y1, z1);
-                        processed[createIndex(x1, y1, z1)] = block != Blocks.air && block != ModBlock.blockImplicitAir ? -1 : 0;
+                        processed[createIndex(x1, y1, z1)] = block != Blocks.air && block != ModBlock.blockImplicitAir && block != ModBlock.blockOrigin ? -1 : 0;
                     }
                 }
             }
@@ -288,6 +312,7 @@ public class InteriorProcessor
                 if (_jobObsolete)
                 {
                     Logger.info("Another job was requested, cancelling this one.");
+                    InteriorProcessor.Instance.tickJobs.removeIf(jobIsCorrelated);
                     return;
                 }
 
@@ -300,7 +325,7 @@ public class InteriorProcessor
                 Block currentBlock = chunk.getBlock(x, y, z);
                 if (currentBlock instanceof BlockAir)
                 {
-                    InteriorProcessor.Instance.tickJobs.add(new SetBlock(world, chunkXStart + x, y, chunkZStart + z, ModBlock.blockImplicitAir, 0));
+                    InteriorProcessor.Instance.tickJobs.add(new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, ModBlock.blockImplicitAir, 0));
                 }
 
                 for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
@@ -327,9 +352,16 @@ public class InteriorProcessor
                 {
                     for (int z = 0; z < 16; ++z)
                     {
+                        if (_jobObsolete)
+                        {
+                            Logger.info("Another job was requested, cancelling this one.");
+                            InteriorProcessor.Instance.tickJobs.removeIf(jobIsCorrelated);
+                            return;
+                        }
+
                         if (processed[createIndex(x, y, z)] == 0 && chunk.getBlock(x, y, z) == ModBlock.blockImplicitAir)
                         {
-                            InteriorProcessor.Instance.tickJobs.add(new SetBlock(world, chunkXStart + x, y, chunkZStart + z, Blocks.air, 0));
+                            InteriorProcessor.Instance.tickJobs.add(new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, Blocks.air, 0));
                         }
                     }
                 }
