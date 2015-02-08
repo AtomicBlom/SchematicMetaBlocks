@@ -11,6 +11,7 @@ import cpw.mods.fml.relauncher.Side;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.proxy.CommonProxy;
 import net.binaryvibrance.schematicmetablocks.schematic.LoadSchematicCommand;
+import net.binaryvibrance.schematicmetablocks.schematic.RecoverSchematicCommand;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -61,6 +62,7 @@ public class TheMod
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
 		event.registerServerCommand(new LoadSchematicCommand());
+		event.registerServerCommand(new RecoverSchematicCommand());
 	}
 
 	@NetworkCheckHandler
