@@ -31,7 +31,6 @@ public class OriginBlock extends MetaBlock implements IBlockWithFloor
         if (!(entity instanceof EntityPlayer)) {
             super.addCollisionBoxesToList(p_149743_1_, p_149743_2_, p_149743_3_, p_149743_4_, p_149743_5_, p_149743_6_, entity);
         }
-
     }
 
     @Override
