@@ -1,6 +1,8 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
-import net.binaryvibrance.schematicmetablocks.JobProcessor;
+import net.binaryvibrance.schematicmetablocks.jobs.ChunkToProcess;
+import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
+import net.binaryvibrance.schematicmetablocks.jobs.JobType;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
@@ -39,7 +41,8 @@ public class InteriorAirMarker extends MetaBlock
     public int onBlockPlaced(World world, int x, int y, int z, int side, float tu, float tv, float tw, int metadata)
     {
         if (!world.isRemote) {
-            JobProcessor.Instance.processChunk(world, x >> 4, z >> 4);
+            ChunkToProcess chunkToProcess = new ChunkToProcess(world, x >> 4, z >> 4);
+            JobProcessor.Instance.scheduleJob(JobType.BACKGROUND, chunkToProcess);
         }
         return metadata;
     }

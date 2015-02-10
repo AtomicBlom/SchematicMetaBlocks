@@ -2,7 +2,10 @@ package net.binaryvibrance.schematicmetablocks.blocks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.TheMod;
+import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
+import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.minecraft.block.material.Material;
@@ -37,12 +40,6 @@ public class RegionBlock extends MetaBlock
     }
 
     @Override
-    public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    @Override
     public boolean hasTileEntity(int metadata)
     {
         return true;
@@ -52,12 +49,6 @@ public class RegionBlock extends MetaBlock
     public TileEntity createTileEntity(World world, int metadata)
     {
         return new RegionTileEntity();
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int getRenderBlockPass()
-    {
-        return 1;
     }
 
     @Override
@@ -71,15 +62,68 @@ public class RegionBlock extends MetaBlock
     @Override
     public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
-        TileEntity tileEntity = blockAccess.getTileEntity(x, y, z);
-        if (tileEntity instanceof RegionTileEntity) {
-            RegionTileEntity regionTileEntity = (RegionTileEntity)tileEntity;
-
-            if (!regionTileEntity.isPaired()) {
-                return badIcon;
+        IIcon icon = null;
+        RegionTileEntity tileEntity = RegionTileEntity.tryGetTileEntity(blockAccess, x, y, z);
+        if (!tileEntity.isPaired()) {
+            icon = badIcon;
+        } else
+        {
+            if (tileEntity.isPrimaryBlock())
+            {
+                icon = blockIcon;
+            } else
+            {
+                icon = opposingIcon;
             }
-
+            Logger.info("getIcon: %s", tileEntity);
         }
-        return null;
+
+        return icon;
+    }
+
+    @Override
+    public void onBlockPreDestroy(World world, int x, int y, int z, int p_149725_5_)
+    {
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity instanceof RegionTileEntity)
+        {
+            RegionTileEntity regionTileEntity = (RegionTileEntity) tileEntity;
+            final RegionTileEntity opposite = regionTileEntity.getOpposite();
+            if (opposite != null)
+            {
+                opposite.setOpposite(null);
+            }
+        }
+    }
+
+    @Override
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
+
+    @Override
+    public int getRenderType()
+    {
+        return ClientProxy.regionBlockRendererId;
+    }
+
+    @Override
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    @Override
+    public int getRenderBlockPass()
+    {
+        return 1;
+    }
+
+    @Override
+    public boolean canRenderInPass(int pass)
+    {
+        ClientProxy.renderPass = pass;
+        return pass < 2;
     }
 }

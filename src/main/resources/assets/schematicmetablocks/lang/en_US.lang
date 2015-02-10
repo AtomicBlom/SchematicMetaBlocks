@@ -4,3 +4,5 @@ tile.schematicmetablocks:blockInteriorAirMarker.name=Interior Air Marker
 tile.schematicmetablocks:blockOrigin.name=Origin Marker
 # Creative Tabs
 itemGroup.schematicmetablocks=Schematic Meta-Blocks
+# Items
+item.schematicmetablocks:metaTool.name=Meta Tool

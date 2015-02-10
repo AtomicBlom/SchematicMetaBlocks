@@ -2,6 +2,7 @@ package net.binaryvibrance.schematicmetablocks.items;
 
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.schematic.SchematicLoader;
+import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import javax.swing.plaf.synth.Region;
+import java.util.List;
 
 public class MetaToolItem extends SchematicMetaBlockItem
 {
@@ -20,31 +22,39 @@ public class MetaToolItem extends SchematicMetaBlockItem
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack p_77659_1_, World p_77659_2_, EntityPlayer p_77659_3_)
-    {
-        Logger.info("OnItemRightClick - " + (p_77659_2_.isRemote ? "remote" : "local"));
-        return super.onItemRightClick(p_77659_1_, p_77659_2_, p_77659_3_);
-
-    }
-
-    @Override
     public boolean onItemUse(ItemStack itemStack, EntityPlayer p_77648_2_, World world, int x, int y, int z, int p_77648_7_, float p_77648_8_, float p_77648_9_, float p_77648_10_)
     {
-        Logger.info("onItemUse - " + (world.isRemote ? "remote" : "local"));
+
+        //Logger.info("onItemUse - " + (world.isRemote ? "remote" : "local"));
         TileEntity tileEntity = world.getTileEntity(x, y, z);
+
         if (tileEntity instanceof RegionTileEntity) {
+            final WorldBlockCoord clickedWorldCoords = new WorldBlockCoord(x, y, z);
+            if (world.isRemote) {
+                return true;
+            }
+
             RegionTileEntity selectedRegion = (RegionTileEntity)tileEntity;
-            NBTTagCompound coords = getCoords(itemStack);
+            NBTTagCompound coords = itemStack.getTagCompound();
             if (coords == null) {
+
+                Logger.info("Setting MetaTool's coordinates - %s", clickedWorldCoords);
                 //Setting item coords
-                setCoords(itemStack, x, y, z);
+
+                itemStack.setTagCompound(clickedWorldCoords.toNBT());
             } else {
                 //Applying coords
-                int altX = coords.getInteger("X");
-                int altY = coords.getInteger("Y");
-                int altZ = coords.getInteger("Z");
+                final WorldBlockCoord oppositeWorldCoords = WorldBlockCoord.fromNBT(coords);
 
-                tileEntity = world.getTileEntity(altX, altY, altZ);
+                if (oppositeWorldCoords.equals(clickedWorldCoords)) {
+                    Logger.info("Clearing MetaTool");
+                    itemStack.setTagCompound(null);
+                    return false;
+                }
+
+                Logger.info("Applying MetaTool Coordinates - %s", oppositeWorldCoords);
+
+                tileEntity = world.getTileEntity(oppositeWorldCoords.x, oppositeWorldCoords.y, oppositeWorldCoords.z);
                 if (!(tileEntity instanceof RegionTileEntity)) {
                     //Message player. The tile entity was probably destroyed.
                     return false;
@@ -53,6 +63,7 @@ public class MetaToolItem extends SchematicMetaBlockItem
 
                 selectedRegion.setOpposite(oppositeRegion);
                 oppositeRegion.setOpposite(selectedRegion);
+                itemStack.setTagCompound(null);
             }
             return true;
         }
@@ -60,27 +71,26 @@ public class MetaToolItem extends SchematicMetaBlockItem
         return false;
     }
 
-
-
-    private void setCoords(ItemStack itemStack, int x, int y, int z)
+    @Override
+    public void addInformation(ItemStack itemStack, EntityPlayer p_77624_2_, List list, boolean p_77624_4_)
     {
-        NBTTagCompound coords = itemStack.getTagCompound();
-        if (coords == null) {
-            coords = new NBTTagCompound();
-            itemStack.setTagCompound(coords);
+        final NBTTagCompound coords = itemStack.getTagCompound();
+        if (coords != null) {
+            final WorldBlockCoord worldBlockCoord = WorldBlockCoord.fromNBT(coords);
+            list.add(String.format("(%d, %d, %d)", worldBlockCoord.x, worldBlockCoord.y, worldBlockCoord.z));
         }
-        coords.setInteger("X", x);
-        coords.setInteger("Y", y);
-        coords.setInteger("Z", z);
-
     }
 
-    private NBTTagCompound getCoords(ItemStack itemStack)
+    @Override
+    public String getItemStackDisplayName(ItemStack stack)
     {
-        NBTTagCompound coords = itemStack.getTagCompound();
-        if (coords == null) {
-            return null;
+        final NBTTagCompound coords = stack.getTagCompound();
+        String coordText = "";
+        if (coords != null) {
+            final WorldBlockCoord worldBlockCoord = WorldBlockCoord.fromNBT(coords);
+            coordText = String.format(" - (%d, %d, %d)", worldBlockCoord.x, worldBlockCoord.y, worldBlockCoord.z);
         }
-        return coords.getCompoundTag("Coord");
+
+        return super.getItemStackDisplayName(stack) + coordText;
     }
 }

@@ -1,7 +1,8 @@
-package net.binaryvibrance.schematicmetablocks.proxy;
+package net.binaryvibrance.schematicmetablocks.client.renderer;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import net.binaryvibrance.schematicmetablocks.blocks.InteriorAirMarker;
+import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;

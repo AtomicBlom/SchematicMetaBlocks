@@ -1,14 +1,12 @@
-package net.binaryvibrance.schematicmetablocks.proxy;
+package net.binaryvibrance.schematicmetablocks.client.renderer;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import net.binaryvibrance.schematicmetablocks.blocks.InteriorAirMarker;
+import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
 import org.lwjgl.opengl.GL11;
 
 public class OriginBlockRenderer implements ISimpleBlockRenderingHandler

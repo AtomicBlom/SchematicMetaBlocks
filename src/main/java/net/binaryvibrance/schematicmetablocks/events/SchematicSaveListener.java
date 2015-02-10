@@ -1,27 +1,22 @@
-package net.binaryvibrance.schematicmetablocks;
+package net.binaryvibrance.schematicmetablocks.events;
 
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.api.event.DuplicateMappingException;
 import com.github.lunatrius.schematica.api.event.PostSchematicCaptureEvent;
 import com.github.lunatrius.schematica.api.event.PreSchematicSaveEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
-import net.binaryvibrance.schematicmetablocks.schematic.SchematicLoader;
 import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SchematicSaveListener
 {
-    public static SchematicSaveListener Instance = new SchematicSaveListener();
+    public static final SchematicSaveListener Instance = new SchematicSaveListener();
 
     private SchematicSaveListener() {
 

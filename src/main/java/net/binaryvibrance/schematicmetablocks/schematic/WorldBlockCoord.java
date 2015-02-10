@@ -56,4 +56,14 @@ public class WorldBlockCoord
         result = 31 * result + z;
         return result;
     }
+
+    @Override
+    public String toString()
+    {
+        return "{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
 }

@@ -1,4 +1,4 @@
-package net.binaryvibrance.schematicmetablocks.proxy;
+package net.binaryvibrance.schematicmetablocks.client.renderer;
 
 import net.minecraft.util.IIcon;
 

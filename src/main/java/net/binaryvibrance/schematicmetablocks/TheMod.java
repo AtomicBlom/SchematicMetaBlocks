@@ -8,6 +8,9 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
+import net.binaryvibrance.schematicmetablocks.events.SchematicSaveListener;
+import net.binaryvibrance.schematicmetablocks.events.WorldListener;
+import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.library.ModItem;
 import net.binaryvibrance.schematicmetablocks.proxy.CommonProxy;
@@ -56,8 +59,9 @@ public class TheMod
 
 		ModBlock.registerTileEntities();
 		proxy.setCustomRenderers();
-		MinecraftForge.EVENT_BUS.register(JobProcessor.Instance);
 		FMLCommonHandler.instance().bus().register(JobProcessor.Instance);
+		MinecraftForge.EVENT_BUS.register(JobProcessor.Instance);
+		MinecraftForge.EVENT_BUS.register(WorldListener.Instance);
 		MinecraftForge.EVENT_BUS.register(SchematicSaveListener.Instance);
 	}
 

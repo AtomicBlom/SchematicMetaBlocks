@@ -2,15 +2,13 @@ package net.binaryvibrance.schematicmetablocks.blocks;
 
 import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
-import net.binaryvibrance.schematicmetablocks.proxy.IBlockWithFloor;
-import net.minecraft.block.Block;
+import net.binaryvibrance.schematicmetablocks.client.renderer.IBlockWithFloor;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import java.util.List;
 
