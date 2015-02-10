@@ -487,7 +487,7 @@ public class SchematicLoader
         return new SchematicWorld(blocks, metadata, tileEntities, width, height, length);
     }
 
-    private static class SchematicWorld
+    public static class SchematicWorld
     {
         private short[] blocks;
         private byte[] metadata;

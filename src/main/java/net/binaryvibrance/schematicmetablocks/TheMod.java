@@ -9,6 +9,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
+import net.binaryvibrance.schematicmetablocks.library.ModItem;
 import net.binaryvibrance.schematicmetablocks.proxy.CommonProxy;
 import net.binaryvibrance.schematicmetablocks.schematic.LoadSchematicCommand;
 import net.binaryvibrance.schematicmetablocks.schematic.RecoverSchematicCommand;
@@ -45,6 +46,7 @@ public class TheMod
 	public void onFMLPreInitialization(FMLPreInitializationEvent event)
 	{
 		ModBlock.init();
+		ModItem.init();
 	}
 
 	@SuppressWarnings("UnusedParameters")
@@ -54,8 +56,8 @@ public class TheMod
 
 		ModBlock.registerTileEntities();
 		proxy.setCustomRenderers();
-		MinecraftForge.EVENT_BUS.register(InteriorProcessor.Instance);
-		FMLCommonHandler.instance().bus().register(InteriorProcessor.Instance);
+		MinecraftForge.EVENT_BUS.register(JobProcessor.Instance);
+		FMLCommonHandler.instance().bus().register(JobProcessor.Instance);
 		MinecraftForge.EVENT_BUS.register(SchematicSaveListener.Instance);
 	}
 

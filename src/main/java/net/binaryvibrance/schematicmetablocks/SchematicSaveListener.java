@@ -7,10 +7,13 @@ import com.github.lunatrius.schematica.api.event.PreSchematicSaveEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
+import net.binaryvibrance.schematicmetablocks.schematic.SchematicLoader;
+import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,42 +28,13 @@ public class SchematicSaveListener
     }
 
     class SchematicContext {
-        BlockLocation origin;
-        List<BlockLocation> smbBlocks = new LinkedList<BlockLocation>();
+        WorldBlockCoord origin;
 
         public void writeTo(NBTTagCompound extendedMetadata)
         {
             if (origin != null) {
-
                 extendedMetadata.setTag("Origin", origin.toNBT());
             }
-        }
-    }
-
-    class BlockLocation {
-        final int x;
-        final int y;
-        final int z;
-
-        final Block block;
-
-        BlockLocation(int x, int y, int z) {
-            this(x, y, z, null);
-        }
-
-        BlockLocation(int x, int y, int z, Block block) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.block = block;
-        }
-
-        public NBTTagCompound toNBT() {
-            NBTTagCompound origin = new NBTTagCompound();
-            origin.setInteger("X", x);
-            origin.setInteger("Y", y);
-            origin.setInteger("Z", z);
-            return origin;
         }
     }
 
@@ -101,7 +75,7 @@ public class SchematicSaveListener
                     } else if (block instanceof OriginBlock) {
                         schematic.setBlock(x, y, z, Blocks.air, 0);
                         interiorAir++;
-                        context.origin = new BlockLocation(x, y, z);
+                        context.origin = new WorldBlockCoord(x, y, z);
                     }
                 }
             }

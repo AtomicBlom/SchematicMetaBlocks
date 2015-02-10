@@ -20,6 +20,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
+import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
 @GameRegistry.ObjectHolder(TheMod.MOD_ID)
@@ -34,6 +35,7 @@ public final class ModBlock
     public static final ExplicitAirBlock blockExplicitAir = new ExplicitAirBlock();
     public static final OriginBlock blockOrigin = new OriginBlock();
     public static final NullBlock blockNull = new NullBlock();
+    public static final RegionBlock blockRegion = new RegionBlock();
 
     private ModBlock()
     {
@@ -43,6 +45,7 @@ public final class ModBlock
     public static void registerTileEntities()
     {
         GameRegistry.registerTileEntity(InteriorAirMarkerTileEntity.class, getTEName(blockInteriorAirMarker.NAME));
+        GameRegistry.registerTileEntity(RegionTileEntity.class, getTEName(blockRegion.NAME));
     }
 
     private static String getTEName(String name) { return "tile." + name;}
@@ -55,5 +58,6 @@ public final class ModBlock
         GameRegistry.registerBlock(blockExplicitAir, blockExplicitAir.NAME);
         GameRegistry.registerBlock(blockNull, blockNull.NAME);
         GameRegistry.registerBlock(blockOrigin, blockOrigin.NAME);
+        GameRegistry.registerBlock(blockRegion, blockRegion.NAME);
     }
 }

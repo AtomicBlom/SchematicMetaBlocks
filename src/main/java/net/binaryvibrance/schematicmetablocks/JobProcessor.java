@@ -21,13 +21,13 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-public class InteriorProcessor
+public class JobProcessor
 {
-    public static InteriorProcessor Instance = new InteriorProcessor();
+    public static JobProcessor Instance = new JobProcessor();
     private final Thread _thread;
     private final Object jobContextSwitchLock = new Object();
 
-    private InteriorProcessor()
+    private JobProcessor()
     {
         _thread = new Thread(new Runnable()
         {
@@ -312,7 +312,7 @@ public class InteriorProcessor
                 if (_jobObsolete)
                 {
                     Logger.info("Another job was requested, cancelling this one.");
-                    InteriorProcessor.Instance.tickJobs.removeIf(jobIsCorrelated);
+                    JobProcessor.Instance.tickJobs.removeIf(jobIsCorrelated);
                     return;
                 }
 
@@ -325,7 +325,7 @@ public class InteriorProcessor
                 Block currentBlock = chunk.getBlock(x, y, z);
                 if (currentBlock instanceof BlockAir)
                 {
-                    InteriorProcessor.Instance.tickJobs.add(new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, ModBlock.blockImplicitAir, 0));
+                    JobProcessor.Instance.tickJobs.add(new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, ModBlock.blockImplicitAir, 0));
                 }
 
                 for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
@@ -355,13 +355,13 @@ public class InteriorProcessor
                         if (_jobObsolete)
                         {
                             Logger.info("Another job was requested, cancelling this one.");
-                            InteriorProcessor.Instance.tickJobs.removeIf(jobIsCorrelated);
+                            JobProcessor.Instance.tickJobs.removeIf(jobIsCorrelated);
                             return;
                         }
 
                         if (processed[createIndex(x, y, z)] == 0 && chunk.getBlock(x, y, z) == ModBlock.blockImplicitAir)
                         {
-                            InteriorProcessor.Instance.tickJobs.add(new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, Blocks.air, 0));
+                            JobProcessor.Instance.tickJobs.add(new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, Blocks.air, 0));
                         }
                     }
                 }

@@ -1,6 +1,6 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
-import net.binaryvibrance.schematicmetablocks.InteriorProcessor;
+import net.binaryvibrance.schematicmetablocks.JobProcessor;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
@@ -39,7 +39,7 @@ public class InteriorAirMarker extends MetaBlock
     public int onBlockPlaced(World world, int x, int y, int z, int side, float tu, float tv, float tw, int metadata)
     {
         if (!world.isRemote) {
-            InteriorProcessor.Instance.processChunk(world, x >> 4, z >> 4);
+            JobProcessor.Instance.processChunk(world, x >> 4, z >> 4);
         }
         return metadata;
     }
@@ -60,7 +60,6 @@ public class InteriorAirMarker extends MetaBlock
     public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int p_149664_5_)
     {
         world.setBlock(x, y, z, ModBlock.blockImplicitAir, 0, 3);
-        //super.onBlockDestroyedByPlayer(p_149664_1_, p_149664_2_, p_149664_3_, p_149664_4_, p_149664_5_);
     }
 
     @Override

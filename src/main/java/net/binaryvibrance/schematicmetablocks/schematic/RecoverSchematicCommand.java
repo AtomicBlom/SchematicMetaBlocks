@@ -43,7 +43,7 @@ public class RecoverSchematicCommand extends CommandBase
             }
             String filename = args[0];
 
-            final List<BlockToExamine> blocksToExamine = new LinkedList<BlockToExamine>();
+            final List<WorldBlockCoord> blocksToExamine = new LinkedList<WorldBlockCoord>();
 
             final EntityPlayerMP player = (EntityPlayerMP) sender;
             SchematicLoader loader = new SchematicLoader();
@@ -54,7 +54,6 @@ public class RecoverSchematicCommand extends CommandBase
                 {
                     if (event.getBlock() == Blocks.air)
                     {
-                        SchematicLoader.SchematicWorld world = event.schematic;
                         for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS)
                         {
                             Block schematicBlock = event.schematic.getBlock(
@@ -69,7 +68,7 @@ public class RecoverSchematicCommand extends CommandBase
                             }
                         }
                         event.replaceBlock(ModBlock.blockImplicitAir, 0);
-                        blocksToExamine.add(new BlockToExamine(event.worldCoord.getX(), event.worldCoord.getY(), event.worldCoord.getZ()));
+                        blocksToExamine.add(new WorldBlockCoord(event.worldCoord.getX(), event.worldCoord.getY(), event.worldCoord.getZ()));
 
                     } else if (event.getBlock() == ModBlock.blockNull)
                     {
@@ -96,13 +95,13 @@ public class RecoverSchematicCommand extends CommandBase
 
             while (!blocksToExamine.isEmpty())
             {
-                Stack<BlockToExamine> contiguousBlocks = new Stack<BlockToExamine>();
-                List<BlockToExamine> blocksInGroup = new LinkedList<BlockToExamine>();
-                BlockToExamine blockToExamine = blocksToExamine.get(0);
+                Stack<WorldBlockCoord> contiguousBlocks = new Stack<WorldBlockCoord>();
+                List<WorldBlockCoord> blocksInGroup = new LinkedList<WorldBlockCoord>();
+                WorldBlockCoord blockToExamine = blocksToExamine.get(0);
                 contiguousBlocks.push(blockToExamine);
                 blocksInGroup.add(blockToExamine);
 
-                BlockToExamine candidateAirMarker = null;
+                WorldBlockCoord candidateAirMarker = null;
 
                 while (!contiguousBlocks.empty())
                 {
@@ -114,7 +113,7 @@ public class RecoverSchematicCommand extends CommandBase
                         int blockY = blockToExamine.y + direction.offsetY;
                         int blockZ = blockToExamine.z + direction.offsetZ;
 
-                        BlockToExamine neighbourBlockToExamine = new BlockToExamine(blockX, blockY, blockZ);
+                        WorldBlockCoord neighbourBlockToExamine = new WorldBlockCoord(blockX, blockY, blockZ);
                         Block b = world.getBlock(blockX, blockY, blockZ);
 
                         if (b == ModBlock.blockImplicitAir && blockX >> 4 == blockToExamine.x >> 4 && blockZ >> 4 == blockToExamine.z >> 4)
@@ -150,41 +149,4 @@ public class RecoverSchematicCommand extends CommandBase
         }
     }
 
-    private class BlockToExamine
-    {
-        private final int x;
-        private final int y;
-        private final int z;
-
-        public BlockToExamine(int x, int y, int z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            final BlockToExamine that = (BlockToExamine) o;
-
-            if (x != that.x) return false;
-            if (y != that.y) return false;
-            if (z != that.z) return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            int result = x;
-            result = 31 * result + y;
-            result = 31 * result + z;
-            return result;
-        }
-    }
 }
