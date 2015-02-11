@@ -1,9 +1,12 @@
 package net.binaryvibrance.schematicmetablocks.items;
 
 import net.binaryvibrance.schematicmetablocks.Logger;
+import net.binaryvibrance.schematicmetablocks.TheMod;
+import net.binaryvibrance.schematicmetablocks.gui.GUIs;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -67,26 +70,68 @@ public class MetaToolItem extends SchematicMetaBlockItem
         TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity instanceof RegionTileEntity) {
             MetaToolMode mode = getMetaToolMode(stack);
-            switch (mode) {
+            final RegionTileEntity regionTileEntity = (RegionTileEntity) tileEntity;
 
+            switch (mode) {
                 case PULL:
-                    return moveRegion(world, new WorldBlockCoord(x, y, z), side, (RegionTileEntity) tileEntity, false );
+                    return moveRegion(world, new WorldBlockCoord(x, y, z), side, regionTileEntity, false );
                 case PUSH:
-                    return moveRegion(world, new WorldBlockCoord(x, y, z), side, (RegionTileEntity) tileEntity, true );
+                    return moveRegion(world, new WorldBlockCoord(x, y, z), side, regionTileEntity, true );
                 case SAVE_SCHEMATIC:
-                    break;
+                    return saveSchematic(world, player, regionTileEntity);
                 case SET_NAME:
-                    break;
+                    return setName(world, player, regionTileEntity);
                 case CLEAR_METATOOL:
                     return clearMetaTool(stack, player);
                 case SET_REGION:
-                    return linkRegions(stack, world, player, new WorldBlockCoord(x, y, z), (RegionTileEntity) tileEntity);
+                    return linkRegions(stack, world, player, new WorldBlockCoord(x, y, z), regionTileEntity);
                 case CLEAR_REGION:
-                    return clearRegion((RegionTileEntity)tileEntity);
-
+                    return clearRegion(regionTileEntity);
             }
         }
 
+        return false;
+    }
+
+    private boolean saveSchematic(World world, EntityPlayer player, RegionTileEntity regionTileEntity)
+    {
+        if (world.isRemote)
+        {
+
+            if (!regionTileEntity.isPaired())
+            {
+                player.addChatComponentMessage(new ChatComponentText("Cannot save schematic, not paired"));
+                return false;
+            }
+
+            final String schematicName = regionTileEntity.getSchematicName();
+            if (schematicName == null || schematicName.trim().isEmpty()) {
+                player.addChatComponentMessage(new ChatComponentText("Cannot save schematic, name not specified"));
+                return false;
+            }
+
+            final WorldBlockCoord location = regionTileEntity.getWorldBlockLocation();
+            final WorldBlockCoord oppositeLocation = regionTileEntity.getOppositeLocation();
+
+            Minecraft.getMinecraft().thePlayer.sendChatMessage(
+                    String.format("/schematicaSave %d %d %d %d %d %d %s",
+                    location.x, location.y, location.z,
+                    oppositeLocation.x, oppositeLocation.y, oppositeLocation.z,
+                            schematicName)
+                    );
+        }
+
+
+
+        return true;
+    }
+
+    private boolean setName(World world, EntityPlayer player, RegionTileEntity tileEntity)
+    {
+        if(world.isRemote) {
+            player.openGui(TheMod.instance, GUIs.SCHEMATIC_NAME.ordinal(), world, tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
+            return true;
+        }
         return false;
     }
 

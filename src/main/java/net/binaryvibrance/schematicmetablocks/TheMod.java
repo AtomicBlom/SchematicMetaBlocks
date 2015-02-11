@@ -7,12 +7,15 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.binaryvibrance.schematicmetablocks.events.SchematicSaveListener;
 import net.binaryvibrance.schematicmetablocks.events.WorldListener;
+import net.binaryvibrance.schematicmetablocks.gui.GuiHandler;
 import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.library.ModItem;
+import net.binaryvibrance.schematicmetablocks.network.PacketHandler;
 import net.binaryvibrance.schematicmetablocks.proxy.CommonProxy;
 import net.binaryvibrance.schematicmetablocks.schematic.LoadSchematicCommand;
 import net.binaryvibrance.schematicmetablocks.schematic.RecoverSchematicCommand;
@@ -63,10 +66,12 @@ public class TheMod
 		MinecraftForge.EVENT_BUS.register(JobProcessor.Instance);
 		MinecraftForge.EVENT_BUS.register(WorldListener.Instance);
 		MinecraftForge.EVENT_BUS.register(SchematicSaveListener.Instance);
+		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
 	}
 
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
+		NetworkRegistry.INSTANCE.newChannel(RESOURCE_PREFIX + "Network", new PacketHandler());
 		event.registerServerCommand(new LoadSchematicCommand());
 		event.registerServerCommand(new RecoverSchematicCommand());
 	}

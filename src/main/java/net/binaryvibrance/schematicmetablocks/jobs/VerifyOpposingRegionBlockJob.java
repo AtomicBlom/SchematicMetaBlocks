@@ -11,6 +11,9 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
 
     public VerifyOpposingRegionBlockJob(RegionTileEntity regionTileEntity) {
 
+        if (!regionTileEntity.hasWorldObj() || regionTileEntity.getWorldObj().isRemote) {
+            throw new UnsupportedOperationException("Attempt to process a tile entity with no world object.");
+        }
         this.regionTileEntity = regionTileEntity;
     }
 
@@ -23,19 +26,6 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
         if (opposite == null || !worldBlockLocation.equals(opposite.getOppositeLocation())) {
             isValid = false;
         }
-
-        /*final WorldBlockCoord location = ;
-        if (location == null) {
-            return;
-        }
-        final TileEntity tileEntity = regionTileEntity.getWorldObj().getTileEntity(location.x, location.y, location.z);
-        boolean isValid = false;
-        if (tileEntity instanceof RegionTileEntity) {
-            RegionTileEntity regionTileEntity = (RegionTileEntity)tileEntity;
-            if (regionTileEntity.getWorldBlockLocation().equals(this.regionTileEntity.getWorldBlockLocation())) {
-                isValid = true;
-            }
-        }*/
 
         Logger.info("VerifyOpposingRegionBlockJob: %s - %s", worldBlockLocation, isValid);
         if (!isValid) {

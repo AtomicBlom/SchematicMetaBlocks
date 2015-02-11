@@ -17,6 +17,7 @@ import javax.swing.plaf.synth.Region;
 public class RegionTileEntity extends TileEntity
 {
     private WorldBlockCoord oppositeLocation;
+    private String schematicName;
 
     public boolean isPaired()
     {
@@ -26,7 +27,6 @@ public class RegionTileEntity extends TileEntity
     public void setOpposite(RegionTileEntity newOpposite) {
         Logger.info("Setting Region Opposite: %s", this);
         this.oppositeLocation = newOpposite == null ? null : newOpposite.getWorldBlockLocation();
-        //sendUpdate();
     }
 
     public void setOppositeWithReverify(RegionTileEntity newOpposite)
@@ -76,18 +76,24 @@ public class RegionTileEntity extends TileEntity
         Logger.info("writing to NBT: %s", this);
         if (oppositeLocation != null )
         {
-            nbt.setTag("opposite", oppositeLocation.toNBT());
+            nbt.setTag("Opposite", oppositeLocation.toNBT());
         }
-
+        if (schematicName != null) {
+            nbt.setString("SchematicName", schematicName);
+        }
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt)
     {
         super.readFromNBT(nbt);
-        this.oppositeLocation = WorldBlockCoord.fromNBT(nbt.getCompoundTag("opposite"));
+        this.oppositeLocation = WorldBlockCoord.fromNBT(nbt.getCompoundTag("Opposite"));
+        this.schematicName = nbt.hasKey("SchematicName") ? nbt.getString("SchematicName") : null;
         Logger.info("Reading from NBT: %s", this);
-        JobProcessor.Instance.scheduleJob(JobType.WORLD_TICK, new VerifyOpposingRegionBlockJob(this));
+        if (this.hasWorldObj() && !worldObj.isRemote)
+        {
+            JobProcessor.Instance.scheduleJob(JobType.WORLD_TICK, new VerifyOpposingRegionBlockJob(this));
+        }
         if (worldObj != null && worldObj.isRemote) {
             sendUpdate();
         }
@@ -137,6 +143,25 @@ public class RegionTileEntity extends TileEntity
                 .add("zCoord", zCoord)
                 .add("oppositeLocation", oppositeLocation)
                 .add("isRemote", worldObj == null ? "unknown" : worldObj.isRemote)
+                .add("schematicName", schematicName)
                 .toString();
+    }
+
+    public String getSchematicName()
+    {
+        return schematicName;
+    }
+
+    public void setSchematicName(String schematicName) {
+        setSchematicNameInternal(schematicName);
+        if (isPaired()) {
+            getOpposite().setSchematicNameInternal(schematicName);
+        }
+
+    }
+
+    private void setSchematicNameInternal(String schematicName) {
+        this.schematicName = schematicName;
+        sendUpdate();
     }
 }

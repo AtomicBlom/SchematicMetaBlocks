@@ -4,6 +4,8 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.binaryvibrance.schematicmetablocks.client.renderer.InvertedMetaBlockRenderer;
 import net.binaryvibrance.schematicmetablocks.client.renderer.OriginBlockRenderer;
 import net.binaryvibrance.schematicmetablocks.client.renderer.RegionBlockRenderer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 
 public class ClientProxy extends CommonProxy
 {
@@ -22,5 +24,4 @@ public class ClientProxy extends CommonProxy
         RenderingRegistry.registerBlockHandler(new OriginBlockRenderer());
         RenderingRegistry.registerBlockHandler(new RegionBlockRenderer());
     }
-
 }
