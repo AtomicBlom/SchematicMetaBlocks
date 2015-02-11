@@ -23,7 +23,13 @@ public class RegionTileEntity extends TileEntity
         return oppositeLocation != null;
     }
 
-    public void setOpposite(RegionTileEntity newOpposite)
+    public void setOpposite(RegionTileEntity newOpposite) {
+        Logger.info("Setting Region Opposite: %s", this);
+        this.oppositeLocation = newOpposite == null ? null : newOpposite.getWorldBlockLocation();
+        //sendUpdate();
+    }
+
+    public void setOppositeWithReverify(RegionTileEntity newOpposite)
     {
         Logger.info("Setting Region Opposite: %s", this);
         RegionTileEntity currentOpposite = getOpposite();

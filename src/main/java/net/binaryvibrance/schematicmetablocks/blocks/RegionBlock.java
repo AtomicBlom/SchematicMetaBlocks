@@ -1,12 +1,7 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
-import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
-import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -62,7 +57,7 @@ public class RegionBlock extends MetaBlock
     @Override
     public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
-        IIcon icon = null;
+        IIcon icon;
         RegionTileEntity tileEntity = RegionTileEntity.tryGetTileEntity(blockAccess, x, y, z);
         if (!tileEntity.isPaired()) {
             icon = badIcon;
@@ -75,7 +70,6 @@ public class RegionBlock extends MetaBlock
             {
                 icon = opposingIcon;
             }
-            Logger.info("getIcon: %s", tileEntity);
         }
 
         return icon;
@@ -91,7 +85,7 @@ public class RegionBlock extends MetaBlock
             final RegionTileEntity opposite = regionTileEntity.getOpposite();
             if (opposite != null)
             {
-                opposite.setOpposite(null);
+                opposite.setOppositeWithReverify(null);
             }
         }
     }

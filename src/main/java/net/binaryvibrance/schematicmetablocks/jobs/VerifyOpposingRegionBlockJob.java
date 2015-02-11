@@ -3,7 +3,6 @@ package net.binaryvibrance.schematicmetablocks.jobs;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
@@ -40,7 +39,7 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
 
         Logger.info("VerifyOpposingRegionBlockJob: %s - %s", worldBlockLocation, isValid);
         if (!isValid) {
-            regionTileEntity.setOpposite(null);
+            regionTileEntity.setOppositeWithReverify(null);
         }
     }
 
