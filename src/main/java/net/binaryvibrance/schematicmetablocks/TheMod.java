@@ -27,58 +27,57 @@ import java.util.Map;
 @Mod(modid = TheMod.MOD_ID, name = TheMod.MOD_NAME, version = TheMod.MOD_VERSION)
 public class TheMod
 {
-	public static final String MOD_ID = "schematicmetablocks";
-	public static final String MOD_NAME = "Schematic Meta-Blocks";
-	public static final String MOD_VERSION = "@MOD_VERSION@";
-	public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ':';
+    public static final String MOD_ID = "schematicmetablocks";
+    public static final String MOD_NAME = "Schematic Meta-Blocks";
+    public static final String MOD_VERSION = "@MOD_VERSION@";
+    public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ':';
+    @SuppressWarnings("AnonymousInnerClass")
+    public static final CreativeTabs CREATIVE_TAB = new CreativeTabs(MOD_ID.toLowerCase())
+    {
+        @Override
+        public Item getTabIconItem()
+        {
+            return Item.getItemFromBlock(ModBlock.blockExplicitAir);
+        }
+    };
+    @Mod.Instance(TheMod.MOD_ID)
+    public static TheMod instance;
+    @SidedProxy(clientSide = "net.binaryvibrance.schematicmetablocks.proxy.ClientProxy", serverSide = "net.binaryvibrance.schematicmetablocks.proxy.CommonProxy")
+    public static CommonProxy proxy;
 
-	@Mod.Instance(TheMod.MOD_ID)
-	public static TheMod instance;
+    @Mod.EventHandler
+    public void onFMLPreInitialization(FMLPreInitializationEvent event)
+    {
+        ModBlock.init();
+        ModItem.init();
+    }
 
-	@SidedProxy(clientSide="net.binaryvibrance.schematicmetablocks.proxy.ClientProxy", serverSide="net.binaryvibrance.schematicmetablocks.proxy.CommonProxy")
-	public static CommonProxy proxy;
+    @SuppressWarnings("UnusedParameters")
+    @Mod.EventHandler
+    public void onFMLInitialization(FMLInitializationEvent event)
+    {
 
-	@SuppressWarnings("AnonymousInnerClass")
-	public static final CreativeTabs CREATIVE_TAB = new CreativeTabs(MOD_ID.toLowerCase())
-	{
-		@Override
-		public Item getTabIconItem()
-		{
-			return Item.getItemFromBlock(ModBlock.blockExplicitAir);
-		}
-	};
+        ModBlock.registerTileEntities();
+        proxy.setCustomRenderers();
+        FMLCommonHandler.instance().bus().register(JobProcessor.Instance);
+        MinecraftForge.EVENT_BUS.register(JobProcessor.Instance);
+        MinecraftForge.EVENT_BUS.register(WorldListener.Instance);
+        MinecraftForge.EVENT_BUS.register(SchematicSaveListener.Instance);
+        NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
+    }
 
-	@Mod.EventHandler
-	public void onFMLPreInitialization(FMLPreInitializationEvent event)
-	{
-		ModBlock.init();
-		ModItem.init();
-	}
+    @Mod.EventHandler
+    public void serverLoad(FMLServerStartingEvent event)
+    {
+        NetworkRegistry.INSTANCE.newChannel(RESOURCE_PREFIX + "Network", new PacketHandler());
+        event.registerServerCommand(new LoadSchematicCommand());
+        event.registerServerCommand(new RecoverSchematicCommand());
+    }
 
-	@SuppressWarnings("UnusedParameters")
-	@Mod.EventHandler
-	public void onFMLInitialization(FMLInitializationEvent event)
-	{
-
-		ModBlock.registerTileEntities();
-		proxy.setCustomRenderers();
-		FMLCommonHandler.instance().bus().register(JobProcessor.Instance);
-		MinecraftForge.EVENT_BUS.register(JobProcessor.Instance);
-		MinecraftForge.EVENT_BUS.register(WorldListener.Instance);
-		MinecraftForge.EVENT_BUS.register(SchematicSaveListener.Instance);
-		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
-	}
-
-	@Mod.EventHandler
-	public void serverLoad(FMLServerStartingEvent event) {
-		NetworkRegistry.INSTANCE.newChannel(RESOURCE_PREFIX + "Network", new PacketHandler());
-		event.registerServerCommand(new LoadSchematicCommand());
-		event.registerServerCommand(new RecoverSchematicCommand());
-	}
-
-	@NetworkCheckHandler
-	public boolean checkRemoteVersions(Map<String, String> versions, Side side) {
-		return true;
-	}
+    @NetworkCheckHandler
+    public boolean checkRemoteVersions(Map<String, String> versions, Side side)
+    {
+        return true;
+    }
 }
 

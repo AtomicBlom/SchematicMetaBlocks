@@ -26,46 +26,6 @@ public class InteriorAirMarker extends MetaBlock
     }
 
     @Override
-    public boolean hasTileEntity(int metadata)
-    {
-        return true;
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, int metadata)
-    {
-        return new InteriorAirMarkerTileEntity();
-    }
-
-    @Override
-    public int onBlockPlaced(World world, int x, int y, int z, int side, float tu, float tv, float tw, int metadata)
-    {
-        if (!world.isRemote) {
-            ChunkToProcess chunkToProcess = new ChunkToProcess(world, x >> 4, z >> 4);
-            JobProcessor.Instance.scheduleJob(JobType.BACKGROUND, chunkToProcess);
-        }
-        return metadata;
-    }
-
-    @Override
-    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
-    {
-        ForgeDirection direction = ForgeDirection.getOrientation(side);
-        Block b = world.getBlock(x + direction.offsetX, y + direction.offsetY, z + direction.offsetZ);
-        if (b instanceof ImplicitAirBlock || b instanceof InteriorAirMarker) {
-            return null;
-        }
-
-        return super.getIcon(world, x, y, z, side);
-    }
-
-    @Override
-    public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int p_149664_5_)
-    {
-        world.setBlock(x, y, z, ModBlock.blockImplicitAir, 0, 3);
-    }
-
-    @Override
     public boolean renderAsNormalBlock()
     {
         return false;
@@ -78,15 +38,57 @@ public class InteriorAirMarker extends MetaBlock
     }
 
     @Override
+    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
+    {
+        ForgeDirection direction = ForgeDirection.getOrientation(side);
+        Block b = world.getBlock(x + direction.offsetX, y + direction.offsetY, z + direction.offsetZ);
+        if (b instanceof ImplicitAirBlock || b instanceof InteriorAirMarker)
+        {
+            return null;
+        }
+
+        return super.getIcon(world, x, y, z, side);
+    }
+
+    @Override
     public boolean isOpaqueCube()
     {
         return false;
     }
 
     @Override
+    public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int p_149664_5_)
+    {
+        world.setBlock(x, y, z, ModBlock.blockImplicitAir, 0, 3);
+    }
+
+    @Override
     public int getRenderBlockPass()
     {
         return 1;
+    }
+
+    @Override
+    public int onBlockPlaced(World world, int x, int y, int z, int side, float tu, float tv, float tw, int metadata)
+    {
+        if (!world.isRemote)
+        {
+            ChunkToProcess chunkToProcess = new ChunkToProcess(world, x >> 4, z >> 4);
+            JobProcessor.Instance.scheduleJob(JobType.BACKGROUND, chunkToProcess);
+        }
+        return metadata;
+    }
+
+    @Override
+    public boolean hasTileEntity(int metadata)
+    {
+        return true;
+    }
+
+    @Override
+    public TileEntity createTileEntity(World world, int metadata)
+    {
+        return new InteriorAirMarkerTileEntity();
     }
 
     @Override

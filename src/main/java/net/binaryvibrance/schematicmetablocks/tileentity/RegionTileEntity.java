@@ -12,21 +12,22 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
-import javax.swing.plaf.synth.Region;
 
 public class RegionTileEntity extends TileEntity
 {
     private WorldBlockCoord oppositeLocation;
     private String schematicName;
 
+    public static RegionTileEntity tryGetTileEntity(IBlockAccess blockAccess, int x, int y, int z)
+    {
+        TileEntity tileEntity = blockAccess.getTileEntity(x, y, z);
+        if (!(tileEntity instanceof RegionTileEntity)) return null;
+        return (RegionTileEntity) tileEntity;
+    }
+
     public boolean isPaired()
     {
         return oppositeLocation != null;
-    }
-
-    public void setOpposite(RegionTileEntity newOpposite) {
-        Logger.info("Setting Region Opposite: %s", this);
-        this.oppositeLocation = newOpposite == null ? null : newOpposite.getWorldBlockLocation();
     }
 
     public void setOppositeWithReverify(RegionTileEntity newOpposite)
@@ -36,7 +37,8 @@ public class RegionTileEntity extends TileEntity
 
 
         this.oppositeLocation = newOpposite == null ? null : newOpposite.getWorldBlockLocation();
-        if (currentOpposite != null) {
+        if (currentOpposite != null)
+        {
             Logger.info("Scheduling job to clear opposite %s", currentOpposite);
             JobProcessor.Instance.scheduleJob(JobType.WORLD_TICK, new VerifyOpposingRegionBlockJob(currentOpposite));
         }
@@ -48,11 +50,50 @@ public class RegionTileEntity extends TileEntity
         return oppositeLocation;
     }
 
-    public RegionTileEntity getOpposite() {
+    public RegionTileEntity getOpposite()
+    {
         if (oppositeLocation == null) return null;
         TileEntity tileEntity = worldObj.getTileEntity(oppositeLocation.x, oppositeLocation.y, oppositeLocation.z);
         if (!(tileEntity instanceof RegionTileEntity)) return null;
-        return (RegionTileEntity)tileEntity;
+        return (RegionTileEntity) tileEntity;
+    }
+
+    public void setOpposite(RegionTileEntity newOpposite)
+    {
+        Logger.info("Setting Region Opposite: %s", this);
+        this.oppositeLocation = newOpposite == null ? null : newOpposite.getWorldBlockLocation();
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbt)
+    {
+        super.readFromNBT(nbt);
+        this.oppositeLocation = WorldBlockCoord.fromNBT(nbt.getCompoundTag("Opposite"));
+        this.schematicName = nbt.hasKey("SchematicName") ? nbt.getString("SchematicName") : null;
+        Logger.info("Reading from NBT: %s", this);
+        if (this.hasWorldObj() && !worldObj.isRemote)
+        {
+            JobProcessor.Instance.scheduleJob(JobType.WORLD_TICK, new VerifyOpposingRegionBlockJob(this));
+        }
+        if (worldObj != null && worldObj.isRemote)
+        {
+            sendUpdate();
+        }
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbt)
+    {
+        super.writeToNBT(nbt);
+        Logger.info("writing to NBT: %s", this);
+        if (oppositeLocation != null)
+        {
+            nbt.setTag("Opposite", oppositeLocation.toNBT());
+        }
+        if (schematicName != null)
+        {
+            nbt.setString("SchematicName", schematicName);
+        }
     }
 
     @Override
@@ -69,43 +110,8 @@ public class RegionTileEntity extends TileEntity
         readFromNBT(packet.func_148857_g());
     }
 
-    @Override
-    public void writeToNBT(NBTTagCompound nbt)
+    public boolean isPrimaryBlock()
     {
-        super.writeToNBT(nbt);
-        Logger.info("writing to NBT: %s", this);
-        if (oppositeLocation != null )
-        {
-            nbt.setTag("Opposite", oppositeLocation.toNBT());
-        }
-        if (schematicName != null) {
-            nbt.setString("SchematicName", schematicName);
-        }
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
-        super.readFromNBT(nbt);
-        this.oppositeLocation = WorldBlockCoord.fromNBT(nbt.getCompoundTag("Opposite"));
-        this.schematicName = nbt.hasKey("SchematicName") ? nbt.getString("SchematicName") : null;
-        Logger.info("Reading from NBT: %s", this);
-        if (this.hasWorldObj() && !worldObj.isRemote)
-        {
-            JobProcessor.Instance.scheduleJob(JobType.WORLD_TICK, new VerifyOpposingRegionBlockJob(this));
-        }
-        if (worldObj != null && worldObj.isRemote) {
-            sendUpdate();
-        }
-    }
-
-    public static RegionTileEntity tryGetTileEntity(IBlockAccess blockAccess, int x, int y, int z) {
-        TileEntity tileEntity = blockAccess.getTileEntity(x, y, z);
-        if (!(tileEntity instanceof RegionTileEntity)) return null;
-        return (RegionTileEntity)tileEntity;
-    }
-
-    public boolean isPrimaryBlock() {
         final RegionTileEntity opposite = getOpposite();
         if (opposite == null) return false;
         final WorldBlockCoord other = getOppositeLocation();
@@ -152,15 +158,18 @@ public class RegionTileEntity extends TileEntity
         return schematicName;
     }
 
-    public void setSchematicName(String schematicName) {
+    public void setSchematicName(String schematicName)
+    {
         setSchematicNameInternal(schematicName);
-        if (isPaired()) {
+        if (isPaired())
+        {
             getOpposite().setSchematicNameInternal(schematicName);
         }
 
     }
 
-    private void setSchematicNameInternal(String schematicName) {
+    private void setSchematicNameInternal(String schematicName)
+    {
         this.schematicName = schematicName;
         sendUpdate();
     }

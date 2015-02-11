@@ -15,7 +15,20 @@ public class WorldBlockCoord
         this.z = z;
     }
 
-    public NBTTagCompound toNBT() {
+    public static WorldBlockCoord fromNBT(NBTTagCompound nbt)
+    {
+        if (nbt == null)
+        {
+            return null;
+        }
+        int x = nbt.getInteger("X");
+        int y = nbt.getInteger("Y");
+        int z = nbt.getInteger("Z");
+        return new WorldBlockCoord(x, y, z);
+    }
+
+    public NBTTagCompound toNBT()
+    {
         NBTTagCompound origin = new NBTTagCompound();
         origin.setInteger("X", x);
         origin.setInteger("Y", y);
@@ -23,14 +36,13 @@ public class WorldBlockCoord
         return origin;
     }
 
-    public static WorldBlockCoord fromNBT(NBTTagCompound nbt) {
-        if (nbt == null) {
-            return null;
-        }
-        int x = nbt.getInteger("X");
-        int y = nbt.getInteger("Y");
-        int z = nbt.getInteger("Z");
-        return new WorldBlockCoord(x, y, z);
+    @Override
+    public int hashCode()
+    {
+        int result = x;
+        result = 31 * result + y;
+        result = 31 * result + z;
+        return result;
     }
 
     @Override
@@ -46,15 +58,6 @@ public class WorldBlockCoord
         if (z != that.z) return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = x;
-        result = 31 * result + y;
-        result = 31 * result + z;
-        return result;
     }
 
     @Override

@@ -1,8 +1,8 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
 import net.binaryvibrance.schematicmetablocks.TheMod;
-import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.binaryvibrance.schematicmetablocks.client.renderer.IBlockWithFloor;
+import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
@@ -24,20 +24,6 @@ public class OriginBlock extends MetaBlock implements IBlockWithFloor
     }
 
     @Override
-    public void addCollisionBoxesToList(World p_149743_1_, int p_149743_2_, int p_149743_3_, int p_149743_4_, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity entity)
-    {
-        if (!(entity instanceof EntityPlayer)) {
-            super.addCollisionBoxesToList(p_149743_1_, p_149743_2_, p_149743_3_, p_149743_4_, p_149743_5_, p_149743_6_, entity);
-        }
-    }
-
-    @Override
-    public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    @Override
     public IIcon getFloorIcon()
     {
         return floorIcon;
@@ -54,5 +40,20 @@ public class OriginBlock extends MetaBlock implements IBlockWithFloor
     public int getRenderType()
     {
         return ClientProxy.originBlockRendererId;
+    }
+
+    @Override
+    public void addCollisionBoxesToList(World p_149743_1_, int p_149743_2_, int p_149743_3_, int p_149743_4_, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity entity)
+    {
+        if (!(entity instanceof EntityPlayer))
+        {
+            super.addCollisionBoxesToList(p_149743_1_, p_149743_2_, p_149743_3_, p_149743_4_, p_149743_5_, p_149743_6_, entity);
+        }
+    }
+
+    @Override
+    public boolean isOpaqueCube()
+    {
+        return false;
     }
 }

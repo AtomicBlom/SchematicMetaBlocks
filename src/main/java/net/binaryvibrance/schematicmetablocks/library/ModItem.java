@@ -19,8 +19,6 @@ package net.binaryvibrance.schematicmetablocks.library;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.items.MetaToolItem;
-import net.minecraft.item.Item;
-import net.minecraftforge.oredict.OreDictionary;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
 @GameRegistry.ObjectHolder(TheMod.MOD_ID)

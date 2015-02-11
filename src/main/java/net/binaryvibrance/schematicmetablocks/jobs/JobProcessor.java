@@ -4,7 +4,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -15,6 +14,9 @@ public class JobProcessor
     public static JobProcessor Instance = new JobProcessor();
     private final Thread _thread;
     private final Object jobContextSwitchLock = new Object();
+    IJob currentBackgroundJob;
+    private BlockingQueue<IJob> scheduledBackgroundJobs = new LinkedBlockingDeque<IJob>();
+    private ConcurrentLinkedQueue<IJob> scheduledTickJobs = new ConcurrentLinkedQueue<IJob>();
 
     private JobProcessor()
     {
@@ -88,6 +90,7 @@ public class JobProcessor
 
         }
     }
+    //private Queue<IJob> unscheduledBackgroundJobs = new LinkedList<IJob>();
 
     private void scheduleBackgroundJob(IJob jobToProcess)
     {
@@ -117,12 +120,6 @@ public class JobProcessor
         }
     }
 
-    private BlockingQueue<IJob> scheduledBackgroundJobs = new LinkedBlockingDeque<IJob>();
-    private ConcurrentLinkedQueue<IJob> scheduledTickJobs = new ConcurrentLinkedQueue<IJob>();
-    //private Queue<IJob> unscheduledBackgroundJobs = new LinkedList<IJob>();
-
-    IJob currentBackgroundJob;
-
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent tickEvent)
     {
@@ -145,8 +142,10 @@ public class JobProcessor
         scheduledTickJobs.add(job);
     }*/
 
-    public void scheduleJob(JobType jobType, IJob job) {
-        switch (jobType) {
+    public void scheduleJob(JobType jobType, IJob job)
+    {
+        switch (jobType)
+        {
             case WORLD_TICK:
                 scheduledTickJobs.add(job);
                 break;
@@ -158,7 +157,8 @@ public class JobProcessor
 
     public void unscheduleJobsIf(JobType jobType, Predicate<IJob> jobIsCorrelated)
     {
-        switch (jobType) {
+        switch (jobType)
+        {
             case WORLD_TICK:
                 scheduledTickJobs.removeIf(jobIsCorrelated);
                 break;

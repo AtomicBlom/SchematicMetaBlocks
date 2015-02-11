@@ -1,5 +1,6 @@
 package net.binaryvibrance.schematicmetablocks.gui;
 
-public enum GUIs {
+public enum GUIs
+{
     SCHEMATIC_NAME
 }

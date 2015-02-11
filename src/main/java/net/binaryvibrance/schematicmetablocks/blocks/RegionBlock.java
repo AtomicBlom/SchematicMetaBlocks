@@ -27,26 +27,6 @@ public class RegionBlock extends MetaBlock
     }
 
     @Override
-    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity entity)
-    {
-        if (!(entity instanceof EntityPlayer)) {
-            super.addCollisionBoxesToList(world, x, y, z, p_149743_5_, p_149743_6_, entity);
-        }
-    }
-
-    @Override
-    public boolean hasTileEntity(int metadata)
-    {
-        return true;
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, int metadata)
-    {
-        return new RegionTileEntity();
-    }
-
-    @Override
     public void registerBlockIcons(IIconRegister iconRegister)
     {
         super.registerBlockIcons(iconRegister);
@@ -55,11 +35,24 @@ public class RegionBlock extends MetaBlock
     }
 
     @Override
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
+
+    @Override
+    public int getRenderType()
+    {
+        return ClientProxy.regionBlockRendererId;
+    }
+
+    @Override
     public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
         IIcon icon;
         RegionTileEntity tileEntity = RegionTileEntity.tryGetTileEntity(blockAccess, x, y, z);
-        if (!tileEntity.isPaired()) {
+        if (!tileEntity.isPaired())
+        {
             icon = badIcon;
         } else
         {
@@ -73,6 +66,27 @@ public class RegionBlock extends MetaBlock
         }
 
         return icon;
+    }
+
+    @Override
+    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity entity)
+    {
+        if (!(entity instanceof EntityPlayer))
+        {
+            super.addCollisionBoxesToList(world, x, y, z, p_149743_5_, p_149743_6_, entity);
+        }
+    }
+
+    @Override
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    @Override
+    public int getRenderBlockPass()
+    {
+        return 1;
     }
 
     @Override
@@ -91,27 +105,15 @@ public class RegionBlock extends MetaBlock
     }
 
     @Override
-    public boolean renderAsNormalBlock()
+    public boolean hasTileEntity(int metadata)
     {
-        return false;
+        return true;
     }
 
     @Override
-    public int getRenderType()
+    public TileEntity createTileEntity(World world, int metadata)
     {
-        return ClientProxy.regionBlockRendererId;
-    }
-
-    @Override
-    public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    @Override
-    public int getRenderBlockPass()
-    {
-        return 1;
+        return new RegionTileEntity();
     }
 
     @Override

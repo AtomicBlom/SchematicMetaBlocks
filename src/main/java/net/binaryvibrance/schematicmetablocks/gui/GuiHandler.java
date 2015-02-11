@@ -15,7 +15,7 @@ public class GuiHandler implements IGuiHandler
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
     {
-        if(ID == GUIs.SCHEMATIC_NAME.ordinal()) return new GuiSchematicName(player, world, x, y, z);
+        if (ID == GUIs.SCHEMATIC_NAME.ordinal()) return new GuiSchematicName(player, world, x, y, z);
         else return null;
     }
 }

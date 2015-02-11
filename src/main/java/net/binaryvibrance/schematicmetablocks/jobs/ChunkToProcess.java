@@ -20,6 +20,7 @@ public class ChunkToProcess implements IJob, IWorldJob
     private final World world;
     private final int _x;
     private final int _z;
+    AtomicInteger idGenerator = new AtomicInteger();
     private boolean _jobObsolete;
 
     public ChunkToProcess(World world, int x, int z)
@@ -48,8 +49,6 @@ public class ChunkToProcess implements IJob, IWorldJob
     {
         return (index >> 8);
     }
-
-    AtomicInteger idGenerator = new AtomicInteger();
 
     public void start()
     {

@@ -30,6 +30,11 @@ public class SchematicMetaBlockItem extends Item
         setCreativeTab(TheMod.CREATIVE_TAB);
     }
 
+    public static String getUnwrappedUnlocalizedName(String unlocalizedName)
+    {
+        return unlocalizedName.substring(unlocalizedName.indexOf('.') + 1);
+    }
+
     @Override
     public String getUnlocalizedName()
     {
@@ -48,10 +53,5 @@ public class SchematicMetaBlockItem extends Item
     {
         final String unlocalizedName = getUnlocalizedName();
         itemIcon = iconRegister.registerIcon(unlocalizedName.substring(unlocalizedName.indexOf('.') + 1));
-    }
-
-    public static String getUnwrappedUnlocalizedName(String unlocalizedName)
-    {
-        return unlocalizedName.substring(unlocalizedName.indexOf('.') + 1);
     }
 }

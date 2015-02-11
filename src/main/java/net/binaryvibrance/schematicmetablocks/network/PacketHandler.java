@@ -8,7 +8,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
@@ -18,19 +17,23 @@ import java.io.IOException;
 public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket>
 {
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket packet) throws Exception {
-        if (packet.channel().equals(TheMod.RESOURCE_PREFIX + "Network")) {
+    protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket packet) throws Exception
+    {
+        if (packet.channel().equals(TheMod.RESOURCE_PREFIX + "Network"))
+        {
             ByteBuf payload = packet.payload();
             final PacketBuffer packetBuffer = new PacketBuffer(payload);
             final PacketType[] values = PacketType.values();
             final int packetTypeValue = packetBuffer.readInt();
-            if (packetTypeValue >= values.length) {
+            if (packetTypeValue >= values.length)
+            {
                 Logger.warning("Unknown Packet type: %d", packetTypeValue);
                 return;
             }
 
             PacketType packetType = values[packetTypeValue];
-            switch (packetType) {
+            switch (packetType)
+            {
                 case SET_SCHEMATIC_NAME:
                     setSchematicName(packetBuffer);
                     break;
@@ -48,7 +51,8 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket>
 
         final WorldServer worldServer = MinecraftServer.getServer().worldServerForDimension(dimension);
         RegionTileEntity te = RegionTileEntity.tryGetTileEntity(worldServer, x, y, z);
-        if (te != null) {
+        if (te != null)
+        {
             te.setSchematicName(newName);
         }
 

@@ -6,11 +6,8 @@ import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import org.lwjgl.opengl.GL11;
 
@@ -29,9 +26,10 @@ public class RegionBlockRenderer implements ISimpleBlockRenderingHandler
 
         if (ClientProxy.renderPass == 0)
         {
-            final double e = 1/16;
+            final double e = 1 / 16;
             final RegionTileEntity primary = RegionTileEntity.tryGetTileEntity(world, x, y, z);
-            if (primary.isPrimaryBlock()) {
+            if (primary.isPrimaryBlock())
+            {
                 final RegionTileEntity opposite = primary.getOpposite();
 
                 final WorldBlockCoord primaryLocation = primary.getWorldBlockLocation();
@@ -85,7 +83,8 @@ public class RegionBlockRenderer implements ISimpleBlockRenderingHandler
                 return true;
             }
 
-        } else if (ClientProxy.renderPass == 1) {
+        } else if (ClientProxy.renderPass == 1)
+        {
 
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             renderer.renderStandardBlock(block, x, y, z);

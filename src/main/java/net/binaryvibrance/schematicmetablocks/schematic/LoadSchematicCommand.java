@@ -29,8 +29,10 @@ public class LoadSchematicCommand extends CommandBase
     public void processCommand(ICommandSender sender, String[] args)
     {
 
-        if (sender instanceof EntityPlayerMP) {
-            if (args.length < 1) {
+        if (sender instanceof EntityPlayerMP)
+        {
+            if (args.length < 1)
+            {
                 throw new CommandException("Could not execute command");
             }
             String filename = args[0];

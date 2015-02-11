@@ -9,9 +9,11 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
 {
     private final RegionTileEntity regionTileEntity;
 
-    public VerifyOpposingRegionBlockJob(RegionTileEntity regionTileEntity) {
+    public VerifyOpposingRegionBlockJob(RegionTileEntity regionTileEntity)
+    {
 
-        if (!regionTileEntity.hasWorldObj() || regionTileEntity.getWorldObj().isRemote) {
+        if (!regionTileEntity.hasWorldObj() || regionTileEntity.getWorldObj().isRemote)
+        {
             throw new UnsupportedOperationException("Attempt to process a tile entity with no world object.");
         }
         this.regionTileEntity = regionTileEntity;
@@ -23,12 +25,14 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
         final RegionTileEntity opposite = regionTileEntity.getOpposite();
         boolean isValid = true;
         final WorldBlockCoord worldBlockLocation = regionTileEntity.getWorldBlockLocation();
-        if (opposite == null || !worldBlockLocation.equals(opposite.getOppositeLocation())) {
+        if (opposite == null || !worldBlockLocation.equals(opposite.getOppositeLocation()))
+        {
             isValid = false;
         }
 
         Logger.info("VerifyOpposingRegionBlockJob: %s - %s", worldBlockLocation, isValid);
-        if (!isValid) {
+        if (!isValid)
+        {
             regionTileEntity.setOppositeWithReverify(null);
         }
     }
@@ -36,8 +40,9 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
     @Override
     public boolean represents(IJob otherJob)
     {
-        if (otherJob instanceof VerifyOpposingRegionBlockJob) {
-            VerifyOpposingRegionBlockJob job = (VerifyOpposingRegionBlockJob)otherJob;
+        if (otherJob instanceof VerifyOpposingRegionBlockJob)
+        {
+            VerifyOpposingRegionBlockJob job = (VerifyOpposingRegionBlockJob) otherJob;
             return regionTileEntity.getWorldBlockLocation().equals(job.regionTileEntity.getWorldBlockLocation());
         }
         return false;

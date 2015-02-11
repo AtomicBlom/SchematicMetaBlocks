@@ -41,7 +41,7 @@ public class OriginBlockRenderer implements ISimpleBlockRenderingHandler
 
         final double e = 0.0002;
 
-        IBlockWithFloor blockWithFloor = (IBlockWithFloor)block;
+        IBlockWithFloor blockWithFloor = (IBlockWithFloor) block;
         renderIcon = blockWithFloor.getFloorIcon();
 
         renderer.renderStandardBlock(block, x, y, z);
@@ -53,7 +53,7 @@ public class OriginBlockRenderer implements ISimpleBlockRenderingHandler
         double textureVMax = renderIcon.getMaxV();
         //tessellator.setBrightness(240);
         tessellator.addVertexWithUV(xPos + 1 + 0.5, yPos + e, zPos - 0.5, textureUMin, textureVMax);
-        tessellator.addVertexWithUV(xPos - 0.5, yPos + e, zPos- 0.5, textureUMin, textureVMin);
+        tessellator.addVertexWithUV(xPos - 0.5, yPos + e, zPos - 0.5, textureUMin, textureVMin);
         tessellator.addVertexWithUV(xPos - 0.5, yPos + e, zPos + 1 + 0.5, textureUMax, textureVMin);
         tessellator.addVertexWithUV(xPos + 1 + 0.5, yPos + e, zPos + 1 + 0.5, textureUMax, textureVMax);
         //GL11.glPolygonOffset(0.0F, 0.0F);

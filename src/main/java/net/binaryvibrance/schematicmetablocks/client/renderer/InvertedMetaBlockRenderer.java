@@ -43,7 +43,8 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
         //get the tessellator instance
         Tessellator tessellator = Tessellator.instance;
 
-        if (block instanceof InteriorAirMarker) {
+        if (block instanceof InteriorAirMarker)
+        {
             renderThing(xPos, yPos, zPos, tessellator);
         }
 
@@ -133,6 +134,18 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
         return true;
     }
 
+    @Override
+    public boolean shouldRender3DInInventory(int modelId)
+    {
+        return true;
+    }
+
+    @Override
+    public int getRenderId()
+    {
+        return ClientProxy.insideMetadataBlockRendererId;
+    }
+
     private void renderThing(double xPos, double yPos, double zPos, Tessellator tessellator)
     {
         final IIcon renderIcon;
@@ -146,7 +159,7 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
                 renderIcon.getInterpolatedU(0), renderIcon.getInterpolatedV(0));
         tessellator.addVertexWithUV(
                 xPos + pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4) );
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4));
         tessellator.addVertexWithUV(
                 xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
                 renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4));
@@ -165,7 +178,7 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
                 renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12));
         tessellator.addVertexWithUV(
                 xPos + pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4) );
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4));
 
         tessellator.addVertexWithUV(
                 xPos, yPos, zPos + 1,
@@ -178,14 +191,14 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
                 renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(12));
         tessellator.addVertexWithUV(
                 xPos + pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
-                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12) );
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12));
 
         tessellator.addVertexWithUV(
                 xPos + 1, yPos, zPos,
                 renderIcon.getInterpolatedU(16), renderIcon.getInterpolatedV(0));
         tessellator.addVertexWithUV(
                 xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
-                renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4) );
+                renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4));
         tessellator.addVertexWithUV(
                 xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
                 renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(12));
@@ -198,7 +211,7 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
                 renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(4));
         tessellator.addVertexWithUV(
                 xPos + pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
-                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12) );
+                renderIcon.getInterpolatedU(4), renderIcon.getInterpolatedV(12));
 
         tessellator.addVertexWithUV(
                 xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + 1 - pedestalHeight,
@@ -206,18 +219,6 @@ public class InvertedMetaBlockRenderer implements ISimpleBlockRenderingHandler
         tessellator.addVertexWithUV(
                 xPos + 1 - pedestalHeight, yPos + pedestalHeight, zPos + pedestalHeight,
                 renderIcon.getInterpolatedU(12), renderIcon.getInterpolatedV(4));
-    }
-
-    @Override
-    public boolean shouldRender3DInInventory(int modelId)
-    {
-        return true;
-    }
-
-    @Override
-    public int getRenderId()
-    {
-        return ClientProxy.insideMetadataBlockRendererId;
     }
 
 }

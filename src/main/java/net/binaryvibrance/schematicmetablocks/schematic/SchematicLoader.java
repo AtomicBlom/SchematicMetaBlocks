@@ -1,6 +1,5 @@
 package net.binaryvibrance.schematicmetablocks.schematic;
 
-import com.sun.org.apache.bcel.internal.classfile.Unknown;
 import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
 import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.block.Block;
@@ -28,29 +27,12 @@ import java.util.*;
 
 public class SchematicLoader
 {
+    private static final FMLControlledNamespacedRegistry<Block> BLOCK_REGISTRY = GameData.getBlockRegistry();
+    private static Logger _logger = LogManager.getLogger("SchematicLoader");
     private Map<ResourceLocation, SchematicWorld> loadedSchematics = new HashMap<ResourceLocation, SchematicWorld>();
-
     private List<ITileEntityLoadedEvent> tileEntityLoadedEventListeners = new LinkedList<ITileEntityLoadedEvent>();
     private List<IPreSetBlockEventListener> setBlockEventListeners;
     private List<IUnknownBlockEventListener> unknownBlockEventListener;
-
-    public void addSetBlockEventListener(IPreSetBlockEventListener listener)
-    {
-        if (setBlockEventListeners == null)
-        {
-            setBlockEventListeners = new LinkedList<IPreSetBlockEventListener>();
-        }
-        setBlockEventListeners.add(listener);
-    }
-
-    public void addUnknownBlockEventListener(IUnknownBlockEventListener listener)
-    {
-        if (unknownBlockEventListener == null)
-        {
-            unknownBlockEventListener = new LinkedList<IUnknownBlockEventListener>();
-        }
-        unknownBlockEventListener.add(listener);
-    }
 
     public SchematicLoader()
     {
@@ -84,6 +66,24 @@ public class SchematicLoader
                 return false;
             }
         });
+    }
+
+    public void addSetBlockEventListener(IPreSetBlockEventListener listener)
+    {
+        if (setBlockEventListeners == null)
+        {
+            setBlockEventListeners = new LinkedList<IPreSetBlockEventListener>();
+        }
+        setBlockEventListeners.add(listener);
+    }
+
+    public void addUnknownBlockEventListener(IUnknownBlockEventListener listener)
+    {
+        if (unknownBlockEventListener == null)
+        {
+            unknownBlockEventListener = new LinkedList<IUnknownBlockEventListener>();
+        }
+        unknownBlockEventListener.add(listener);
     }
 
     public ResourceLocation loadSchematic(File file)
@@ -348,10 +348,6 @@ public class SchematicLoader
         _logger.info(String.format("Writing schematic took %d millis", end - start));
     }
 
-    private static Logger _logger = LogManager.getLogger("SchematicLoader");
-
-    private static final FMLControlledNamespacedRegistry<Block> BLOCK_REGISTRY = GameData.getBlockRegistry();
-
     public SchematicWorld readFromFile(InputStream inputStream)
     {
         try
@@ -422,19 +418,23 @@ public class SchematicLoader
                     oldToNew.put(mapping.getShort(name), id1);
                 } else
                 {
-                    if (unknownBlockEventListener != null) {
+                    if (unknownBlockEventListener != null)
+                    {
                         UnknownBlockEvent event = new UnknownBlockEvent(name, GameData.getBlockRegistry());
                         for (final IUnknownBlockEventListener listener : unknownBlockEventListener)
                         {
                             listener.unknownBlock(event);
                         }
-                        if (event.isRemapped()) {
+                        if (event.isRemapped())
+                        {
                             oldToNew.put(mapping.getShort(name), event.newId);
-                        } else {
+                        } else
+                        {
                             oldToNew.put(mapping.getShort(name), currentBadId);
                             currentBadId--;
                         }
-                    } else {
+                    } else
+                    {
                         oldToNew.put(mapping.getShort(name), currentBadId);
                         currentBadId--;
                     }
@@ -487,11 +487,26 @@ public class SchematicLoader
         return new SchematicWorld(blocks, metadata, tileEntities, width, height, length);
     }
 
+    public interface ITileEntityLoadedEvent
+    {
+        boolean onTileEntityAdded(TileEntity tileEntity);
+    }
+
+    public interface IPreSetBlockEventListener
+    {
+        void preBlockSet(PreSetBlockEvent event);
+    }
+
+    public interface IUnknownBlockEventListener
+    {
+        void unknownBlock(UnknownBlockEvent event);
+    }
+
     public static class SchematicWorld
     {
+        private final Map<WorldBlockCoord, NBTTagCompound> tileEntities = new HashMap<WorldBlockCoord, NBTTagCompound>();
         private short[] blocks;
         private byte[] metadata;
-        private final Map<WorldBlockCoord, NBTTagCompound> tileEntities = new HashMap<WorldBlockCoord, NBTTagCompound>();
         private short width;
         private short height;
         private short length;
@@ -598,79 +613,6 @@ public class SchematicLoader
         }
     }
 
-    public interface ITileEntityLoadedEvent
-    {
-        boolean onTileEntityAdded(TileEntity tileEntity);
-    }
-
-    public interface IPreSetBlockEventListener
-    {
-        void preBlockSet(PreSetBlockEvent event);
-    }
-
-    public interface IUnknownBlockEventListener {
-        void unknownBlock(UnknownBlockEvent event);
-    }
-
-    public class UnknownBlockEvent {
-
-        public final String name;
-        public final FMLControlledNamespacedRegistry<Block> blockRegistry;
-        Short newId;
-
-        public UnknownBlockEvent(String name, FMLControlledNamespacedRegistry<Block> blockRegistry)
-        {
-            this.name = name;
-
-            this.blockRegistry = blockRegistry;
-        }
-
-        public void remap(Block block) {
-            newId = (short)blockRegistry.getId(block);
-        }
-
-        public boolean isRemapped()
-        {
-            return newId != null;
-        }
-    }
-
-    public class PreSetBlockEvent
-    {
-        private int metadata;
-        private Block block;
-        public final SchematicWorld schematic;
-        public final World world;
-        public final WorldBlockCoord worldCoord;
-        public final WorldBlockCoord schematicCoord;
-
-        public PreSetBlockEvent(SchematicWorld schematic, World world, WorldBlockCoord worldCoord, WorldBlockCoord schematicCoord)
-        {
-            this.block = schematic.getBlock(schematicCoord.getX(), schematicCoord.getY(), schematicCoord.getZ());
-            this.metadata = schematic.getBlockMetadata(schematicCoord.getX(), schematicCoord.getY(), schematicCoord.getZ());
-            this.schematic = schematic;
-            this.world = world;
-            this.worldCoord = worldCoord;
-            this.schematicCoord = schematicCoord;
-        }
-
-        public Block getBlock()
-        {
-            return block;
-        }
-
-        public int getMetadata()
-        {
-            return metadata;
-        }
-
-        public void replaceBlock(Block replacementBlock, int metadata)
-        {
-            this.block = replacementBlock;
-            this.metadata = metadata;
-        }
-    }
-
     public static class WorldBlockCoord implements Comparable<WorldBlockCoord>
     {
         private final ImmutableTriple<Integer, Integer, Integer> data;
@@ -721,6 +663,67 @@ public class SchematicLoader
                     : data.middle.compareTo(o.data.middle);
 
             else return data.left.compareTo(o.data.left);
+        }
+    }
+
+    public class UnknownBlockEvent
+    {
+
+        public final String name;
+        public final FMLControlledNamespacedRegistry<Block> blockRegistry;
+        Short newId;
+
+        public UnknownBlockEvent(String name, FMLControlledNamespacedRegistry<Block> blockRegistry)
+        {
+            this.name = name;
+
+            this.blockRegistry = blockRegistry;
+        }
+
+        public void remap(Block block)
+        {
+            newId = (short) blockRegistry.getId(block);
+        }
+
+        public boolean isRemapped()
+        {
+            return newId != null;
+        }
+    }
+
+    public class PreSetBlockEvent
+    {
+        public final SchematicWorld schematic;
+        public final World world;
+        public final WorldBlockCoord worldCoord;
+        public final WorldBlockCoord schematicCoord;
+        private int metadata;
+        private Block block;
+
+        public PreSetBlockEvent(SchematicWorld schematic, World world, WorldBlockCoord worldCoord, WorldBlockCoord schematicCoord)
+        {
+            this.block = schematic.getBlock(schematicCoord.getX(), schematicCoord.getY(), schematicCoord.getZ());
+            this.metadata = schematic.getBlockMetadata(schematicCoord.getX(), schematicCoord.getY(), schematicCoord.getZ());
+            this.schematic = schematic;
+            this.world = world;
+            this.worldCoord = worldCoord;
+            this.schematicCoord = schematicCoord;
+        }
+
+        public Block getBlock()
+        {
+            return block;
+        }
+
+        public int getMetadata()
+        {
+            return metadata;
+        }
+
+        public void replaceBlock(Block replacementBlock, int metadata)
+        {
+            this.block = replacementBlock;
+            this.metadata = metadata;
         }
     }
 
