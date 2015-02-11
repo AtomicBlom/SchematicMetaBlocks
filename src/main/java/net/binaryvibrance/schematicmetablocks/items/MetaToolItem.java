@@ -131,7 +131,7 @@ public class MetaToolItem extends SchematicMetaBlockItem
         }
 
         String name = StatCollector.translateToLocal(
-                String.format("%s.%s.name%s", this.getUnlocalizedNameInefficiently(stack), modeName, extra)
+                String.format("%s.%s.name", this.getUnlocalizedNameInefficiently(stack), modeName) +  extra
         );
         return name;
     }
