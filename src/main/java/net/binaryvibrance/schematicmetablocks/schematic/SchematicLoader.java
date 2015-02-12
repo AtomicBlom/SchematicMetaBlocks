@@ -485,7 +485,12 @@ public class SchematicLoader
             }
         }
 
-        return new SchematicWorld(blocks, metadata, tileEntities, width, height, length);
+        NBTTagCompound extendedMetadata = null;
+        if (tagCompound.hasKey(Names.NBT.EXTENDED_METADATA)) {
+            extendedMetadata = tagCompound.getCompoundTag(Names.NBT.EXTENDED_METADATA);
+        }
+
+        return new SchematicWorld(blocks, metadata, tileEntities, width, height, length, extendedMetadata);
     }
 
     public ISchematicMetadata getSchematicMetadata(ResourceLocation schematicLocation)
@@ -515,6 +520,7 @@ public class SchematicLoader
     public static class SchematicWorld implements ISchematicMetadata
     {
         private final Map<WorldBlockCoord, NBTTagCompound> tileEntities = new HashMap<WorldBlockCoord, NBTTagCompound>();
+        private NBTTagCompound extendedMetadata;
         private short[] blocks;
         private byte[] metadata;
         private short width;
@@ -531,9 +537,10 @@ public class SchematicLoader
             this.length = 0;
         }
 
-        public SchematicWorld(short[] blocks, byte[] metadata, Map<WorldBlockCoord, NBTTagCompound> tileEntities, short width, short height, short length)
+        public SchematicWorld(short[] blocks, byte[] metadata, Map<WorldBlockCoord, NBTTagCompound> tileEntities, short width, short height, short length, NBTTagCompound extendedMetadata)
         {
             this();
+            this.extendedMetadata = extendedMetadata;
 
             this.blocks = blocks != null ? blocks.clone() : new short[width * height * length];
             this.metadata = metadata != null ? metadata.clone() : new byte[width * height * length];
@@ -599,6 +606,12 @@ public class SchematicLoader
             return this.height;
         }
 
+        @Override
+        public NBTTagCompound getExtendedMetadata()
+        {
+            return (NBTTagCompound) extendedMetadata.copy();
+        }
+
         public Collection<NBTTagCompound> getTileEntityData()
         {
             return this.tileEntities.values();
@@ -622,6 +635,7 @@ public class SchematicLoader
             public static final String LENGTH = "Length";
             public static final String HEIGHT = "Height";
             public static final String MAPPING_SCHEMATICA = "SchematicaMapping";
+            public static final String EXTENDED_METADATA = "ExtendedMetadata";
             public static final String TILE_ENTITIES = "TileEntities";
         }
     }

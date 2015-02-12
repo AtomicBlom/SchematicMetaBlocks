@@ -1,5 +1,7 @@
 package net.binaryvibrance.schematicmetablocks.schematic;
 
+import net.minecraft.nbt.NBTTagCompound;
+
 public interface ISchematicMetadata
 {
     int getWidth();
@@ -7,4 +9,6 @@ public interface ISchematicMetadata
     int getLength();
 
     int getHeight();
+
+    NBTTagCompound getExtendedMetadata();
 }

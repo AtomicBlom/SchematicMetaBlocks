@@ -10,6 +10,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -50,9 +51,10 @@ public class RecoverSchematicCommand extends CommandBase
                 final List<WorldBlockCoord> blocksToExamine = new LinkedList<WorldBlockCoord>();
 
                 final EntityPlayerMP player = (EntityPlayerMP) sender;
+
                 SchematicLoader loader = new SchematicLoader();
 
-                WorldBlockCoord schematicSize = null;
+                WorldBlockCoord playerPosition = new WorldBlockCoord((int)player.posX, (int)player.posY, (int)player.posZ);
 
                 loader.addSetBlockEventListener(new SchematicLoader.IPreSetBlockEventListener()
                 {
@@ -96,15 +98,25 @@ public class RecoverSchematicCommand extends CommandBase
                 });
 
                 ResourceLocation schematicLocation = loader.loadSchematic(new File(Minecraft.getMinecraft().mcDataDir, "\\Schematics\\" + filename + ".schematic"));
+                final ISchematicMetadata metadata = loader.getSchematicMetadata(schematicLocation);
 
                 final World world = player.getEntityWorld();
                 loader.renderSchematicInOneShot(schematicLocation, world, (int) player.posX, (int) player.posY, (int) player.posZ, ForgeDirection.NORTH, false);
+                WorldBlockCoord originBlockCoord = null;
+                final NBTTagCompound extendedMetadata = metadata.getExtendedMetadata();
+                if (extendedMetadata.hasKey("Origin")) {
+                    NBTTagCompound originNBT = extendedMetadata.getCompoundTag("Origin");
+                    originBlockCoord = WorldBlockCoord.fromNBT(originNBT).offset(playerPosition);
+
+                    originBlockCoord.setBlock(world, ModBlock.blockOrigin);
+                }
 
                 while (!blocksToExamine.isEmpty())
                 {
                     Stack<WorldBlockCoord> contiguousBlocks = new Stack<WorldBlockCoord>();
                     List<WorldBlockCoord> blocksInGroup = new LinkedList<WorldBlockCoord>();
                     WorldBlockCoord blockToExamine = blocksToExamine.get(0);
+
                     contiguousBlocks.push(blockToExamine);
                     blocksInGroup.add(blockToExamine);
 
@@ -113,17 +125,16 @@ public class RecoverSchematicCommand extends CommandBase
                     while (!contiguousBlocks.empty())
                     {
                         blockToExamine = contiguousBlocks.pop();
+                        if (blockToExamine.equals(originBlockCoord)) {
+                            continue;
+                        }
 
                         for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS)
                         {
-                            int blockX = blockToExamine.x + direction.offsetX;
-                            int blockY = blockToExamine.y + direction.offsetY;
-                            int blockZ = blockToExamine.z + direction.offsetZ;
+                            WorldBlockCoord neighbourBlockToExamine = blockToExamine.offset(direction);
+                            Block b = neighbourBlockToExamine.getBlock(world);
 
-                            WorldBlockCoord neighbourBlockToExamine = new WorldBlockCoord(blockX, blockY, blockZ);
-                            Block b = world.getBlock(blockX, blockY, blockZ);
-
-                            if (b == ModBlock.blockImplicitAir && blockX >> 4 == blockToExamine.x >> 4 && blockZ >> 4 == blockToExamine.z >> 4)
+                            if (b == ModBlock.blockImplicitAir && neighbourBlockToExamine.chunkX == blockToExamine.chunkX && neighbourBlockToExamine.chunkZ == blockToExamine.chunkZ)
                             {
                                 if (blocksToExamine.contains(neighbourBlockToExamine) && !blocksInGroup.contains(neighbourBlockToExamine))
                                 {
@@ -135,35 +146,34 @@ public class RecoverSchematicCommand extends CommandBase
 
                         if (candidateAirMarker == null & blockToExamine.y > 0)
                         {
-                            Block b = world.getBlock(blockToExamine.x, blockToExamine.y - 1, blockToExamine.z);
-                            if (b != Blocks.air && b != ModBlock.blockExplicitAir && b != ModBlock.blockImplicitAir)
+                            Block blockBelow = blockToExamine.offset(0, -1, 0).getBlock(world);
+                            Block block = blockToExamine.getBlock(world);
+                            if (block == Blocks.air && blockBelow != Blocks.air && blockBelow != ModBlock.blockExplicitAir && blockBelow != ModBlock.blockImplicitAir)
                             {
                                 candidateAirMarker = blockToExamine;
                             }
                         }
                     }
 
-                    if (candidateAirMarker == null)
+                    if (candidateAirMarker == null && !blocksInGroup.get(0).equals(originBlockCoord))
                     {
                         candidateAirMarker = blocksInGroup.get(0);
                     }
 
                     blocksToExamine.removeAll(blocksInGroup);
-                    world.setBlock(candidateAirMarker.x, candidateAirMarker.y, candidateAirMarker.z, ModBlock.blockInteriorAirMarker);
+                    if (candidateAirMarker != null)
+                    {
+                        candidateAirMarker.setBlock(world, ModBlock.blockInteriorAirMarker);
+                    }
                 }
 
-                final ISchematicMetadata metadata = loader.getSchematicMetadata(schematicLocation);
-                final int cornerAX = (int) player.posX - 1;
-                final int cornerAY = (int) player.posY - 1;
-                final int cornerAZ = (int) player.posZ - 1;
-                world.setBlock(cornerAX, cornerAY, cornerAZ, ModBlock.blockRegion);
-                final int cornerBX = (int) player.posX + metadata.getWidth();
-                final int cornerBY = (int) player.posY + metadata.getHeight();
-                final int cornerBZ = (int) player.posZ + metadata.getLength();
-                world.setBlock(cornerBX, cornerBY, cornerBZ, ModBlock.blockRegion);
+                final WorldBlockCoord cornerA = playerPosition.offset(-1, -1, -1);
+                final WorldBlockCoord cornerB = playerPosition.offset(metadata.getWidth(), metadata.getHeight(), metadata.getLength());
+                cornerA.setBlock(world, ModBlock.blockRegion);
+                cornerB.setBlock(world, ModBlock.blockRegion);
 
-                RegionTileEntity regionTileEntityA = RegionTileEntity.tryGetTileEntity(world, cornerAX, cornerAY, cornerAZ);
-                RegionTileEntity regionTileEntityB = RegionTileEntity.tryGetTileEntity(world, cornerBX, cornerBY, cornerBZ);
+                RegionTileEntity regionTileEntityA = RegionTileEntity.tryGetTileEntity(world, cornerA.x, cornerA.y, cornerA.z);
+                RegionTileEntity regionTileEntityB = RegionTileEntity.tryGetTileEntity(world, cornerB.x, cornerB.y, cornerB.z);
                 regionTileEntityA.setLinkedTileEntity(regionTileEntityB);
                 regionTileEntityB.setLinkedTileEntity(regionTileEntityA);
                 regionTileEntityA.setSchematicName(filename);
