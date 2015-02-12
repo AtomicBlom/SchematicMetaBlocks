@@ -18,7 +18,6 @@ public class RegionBlock extends MetaBlock
 {
     public static final String NAME = "blockRegion";
     private IIcon badIcon;
-    private IIcon opposingIcon;
 
     public RegionBlock()
     {
@@ -31,7 +30,6 @@ public class RegionBlock extends MetaBlock
     {
         super.registerBlockIcons(iconRegister);
         badIcon = iconRegister.registerIcon(TheMod.MOD_ID + ":" + NAME + "-bad");
-        opposingIcon = iconRegister.registerIcon(TheMod.MOD_ID + ":" + NAME + "-alt");
     }
 
     @Override
@@ -56,13 +54,7 @@ public class RegionBlock extends MetaBlock
             icon = badIcon;
         } else
         {
-            if (tileEntity.isPrimaryBlock())
-            {
-                icon = blockIcon;
-            } else
-            {
-                icon = opposingIcon;
-            }
+            icon = blockIcon;
         }
 
         return icon;
@@ -96,10 +88,10 @@ public class RegionBlock extends MetaBlock
         if (tileEntity instanceof RegionTileEntity)
         {
             RegionTileEntity regionTileEntity = (RegionTileEntity) tileEntity;
-            final RegionTileEntity opposite = regionTileEntity.getOpposite();
+            final RegionTileEntity opposite = regionTileEntity.getLinkedTileEntity();
             if (opposite != null)
             {
-                opposite.setOppositeWithReverify(null);
+                opposite.setLinkedTileEntityWithReverify(null);
             }
         }
     }

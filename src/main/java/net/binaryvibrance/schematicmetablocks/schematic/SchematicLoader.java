@@ -1,5 +1,6 @@
 package net.binaryvibrance.schematicmetablocks.schematic;
 
+import com.github.lunatrius.schematica.api.ISchematic;
 import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
 import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.block.Block;
@@ -348,7 +349,7 @@ public class SchematicLoader
         _logger.info(String.format("Writing schematic took %d millis", end - start));
     }
 
-    public SchematicWorld readFromFile(InputStream inputStream)
+    private SchematicWorld readFromFile(InputStream inputStream)
     {
         try
         {
@@ -487,6 +488,15 @@ public class SchematicLoader
         return new SchematicWorld(blocks, metadata, tileEntities, width, height, length);
     }
 
+    public ISchematicMetadata getSchematicMetadata(ResourceLocation schematicLocation)
+    {
+        if (loadedSchematics.containsKey(schematicLocation))
+        {
+            return loadedSchematics.get(schematicLocation);
+        }
+        return null;
+    }
+
     public interface ITileEntityLoadedEvent
     {
         boolean onTileEntityAdded(TileEntity tileEntity);
@@ -502,7 +512,7 @@ public class SchematicLoader
         void unknownBlock(UnknownBlockEvent event);
     }
 
-    public static class SchematicWorld
+    public static class SchematicWorld implements ISchematicMetadata
     {
         private final Map<WorldBlockCoord, NBTTagCompound> tileEntities = new HashMap<WorldBlockCoord, NBTTagCompound>();
         private short[] blocks;
@@ -571,16 +581,19 @@ public class SchematicLoader
             return block == null || block.isAir(null, x, y, z);
         }
 
+        @Override
         public int getWidth()
         {
             return this.width;
         }
 
+        @Override
         public int getLength()
         {
             return this.length;
         }
 
+        @Override
         public int getHeight()
         {
             return this.height;

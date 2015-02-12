@@ -22,10 +22,10 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
     @Override
     public void start()
     {
-        final RegionTileEntity opposite = regionTileEntity.getOpposite();
+        final RegionTileEntity opposite = regionTileEntity.getLinkedTileEntity();
         boolean isValid = true;
         final WorldBlockCoord worldBlockLocation = regionTileEntity.getWorldBlockLocation();
-        if (opposite == null || !worldBlockLocation.equals(opposite.getOppositeLocation()))
+        if (opposite == null || !worldBlockLocation.equals(opposite.getLinkedLocation()))
         {
             isValid = false;
         }
@@ -33,7 +33,7 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
         Logger.info("VerifyOpposingRegionBlockJob: %s - %s", worldBlockLocation, isValid);
         if (!isValid)
         {
-            regionTileEntity.setOppositeWithReverify(null);
+            regionTileEntity.setLinkedTileEntityWithReverify(null);
         }
     }
 

@@ -2,6 +2,7 @@ package net.binaryvibrance.schematicmetablocks.jobs;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import net.binaryvibrance.schematicmetablocks.Logger;
 import net.minecraftforge.event.world.WorldEvent;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
@@ -144,6 +145,11 @@ public class JobProcessor
 
     public void scheduleJob(JobType jobType, IJob job)
     {
+        if (!_thread.isAlive()) {
+            Logger.info("Not allocating job, thread is not alive.");
+            return;
+        }
+
         switch (jobType)
         {
             case WORLD_TICK:

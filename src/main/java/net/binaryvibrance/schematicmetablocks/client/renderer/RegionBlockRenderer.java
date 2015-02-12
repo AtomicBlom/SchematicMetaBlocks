@@ -28,9 +28,9 @@ public class RegionBlockRenderer implements ISimpleBlockRenderingHandler
         {
             final double e = 1 / 16;
             final RegionTileEntity primary = RegionTileEntity.tryGetTileEntity(world, x, y, z);
-            if (primary.isPrimaryBlock())
+            if (primary.isRenderBlock())
             {
-                final RegionTileEntity opposite = primary.getOpposite();
+                final RegionTileEntity opposite = primary.getLinkedTileEntity();
 
                 final WorldBlockCoord primaryLocation = primary.getWorldBlockLocation();
                 final WorldBlockCoord oppositeLocation = opposite.getWorldBlockLocation();

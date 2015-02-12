@@ -94,7 +94,9 @@ public class MetaToolItem extends SchematicMetaBlockItem
             final MetaToolMode[] modes = MetaToolMode.values();
             mode = modes[(mode.ordinal() + 1) % modes.length];
             setMetaToolMode(stack, mode);
-            stack.setStackDisplayName(getItemStackDisplayName(stack));
+            final String displayName = getItemStackDisplayName(stack);
+            stack.setStackDisplayName(displayName);
+            player.addChatComponentMessage(new ChatComponentText("MetaTool mode changed: " + displayName));
         }
         return stack;
     }
@@ -131,8 +133,8 @@ public class MetaToolItem extends SchematicMetaBlockItem
         }
 
         String name = StatCollector.translateToLocal(
-                String.format("%s.%s.name", this.getUnlocalizedNameInefficiently(stack), modeName) +  extra
-        );
+                String.format("%s.%s.name", this.getUnlocalizedNameInefficiently(stack), modeName)
+        ) + extra;
         return name;
     }
 
@@ -155,12 +157,22 @@ public class MetaToolItem extends SchematicMetaBlockItem
             }
 
             final WorldBlockCoord location = regionTileEntity.getWorldBlockLocation();
-            final WorldBlockCoord oppositeLocation = regionTileEntity.getOppositeLocation();
+            final WorldBlockCoord oppositeLocation = regionTileEntity.getLinkedLocation();
+
+            int minX = Math.min(location.x, oppositeLocation.x) + 1;
+            int minY = Math.min(location.y, oppositeLocation.y) + 1;
+            int minZ = Math.min(location.z, oppositeLocation.z) + 1;
+
+            int maxX = Math.max(location.x, oppositeLocation.x) - 1;
+            int maxY = Math.max(location.y, oppositeLocation.y) - 1;
+            int maxZ = Math.max(location.z, oppositeLocation.z) - 1;
+
+
 
             Minecraft.getMinecraft().thePlayer.sendChatMessage(
                     String.format("/schematicaSave %d %d %d %d %d %d %s",
-                            location.x, location.y, location.z,
-                            oppositeLocation.x, oppositeLocation.y, oppositeLocation.z,
+                            minX, minY, minZ,
+                            maxX, maxY, maxZ,
                             schematicName)
             );
         }
@@ -188,18 +200,21 @@ public class MetaToolItem extends SchematicMetaBlockItem
         return true;
     }
 
-    private boolean clearRegion(RegionTileEntity tileEntity)
+    private boolean clearRegion(RegionTileEntity selectedTileEntity)
     {
-        if (!tileEntity.isPaired())
+        if (!selectedTileEntity.isPaired())
         {
             return false;
         }
+        final RegionTileEntity linkedTileEntity = selectedTileEntity.getLinkedTileEntity();
+        linkedTileEntity.setLinkedTileEntity(null);
+        linkedTileEntity.setSchematicName(null);
+        selectedTileEntity.setLinkedTileEntity(null);
 
-        tileEntity.setOppositeWithReverify(null);
         return true;
     }
 
-    private boolean moveRegion(World world, WorldBlockCoord worldBlockCoord, int side, RegionTileEntity tileEntity, boolean push)
+    private boolean moveRegion(World world, WorldBlockCoord worldBlockCoord, int side, RegionTileEntity originalTileEntity, boolean push)
     {
         ForgeDirection direction = ForgeDirection.getOrientation(side);
         if (push)
@@ -217,13 +232,18 @@ public class MetaToolItem extends SchematicMetaBlockItem
         }
 
         world.setBlock(newX, newY, newZ, ModBlock.blockRegion);
-        final RegionTileEntity regionTileEntity = RegionTileEntity.tryGetTileEntity(world, newX, newY, newZ);
-        if (regionTileEntity != null && tileEntity.isPaired())
+        final RegionTileEntity newTileEntity = RegionTileEntity.tryGetTileEntity(world, newX, newY, newZ);
+        Logger.info("New Tile Entity %s", newTileEntity);
+        if (newTileEntity != null && originalTileEntity.isPaired())
         {
-            final RegionTileEntity opposite = tileEntity.getOpposite();
-            tileEntity.setOpposite(null);
-            opposite.setOppositeWithReverify(regionTileEntity);
-            regionTileEntity.setOppositeWithReverify(opposite);
+            final RegionTileEntity linkedTileEntity = originalTileEntity.getLinkedTileEntity();
+            Logger.info("Linked Tile Entity: %s", linkedTileEntity);
+            Logger.info("Unlinking Tile Entity: %s", originalTileEntity);
+            originalTileEntity.setLinkedTileEntity(null);
+            Logger.info("(1/2) Linking (%s) to (%s)", linkedTileEntity, newTileEntity);
+            linkedTileEntity.setLinkedTileEntity(newTileEntity);
+            Logger.info("(2/2) Linking (%s) to (%s)", newTileEntity, linkedTileEntity);
+            newTileEntity.setLinkedTileEntity(linkedTileEntity);
         }
         world.setBlockToAir(worldBlockCoord.x, worldBlockCoord.y, worldBlockCoord.z);
 
@@ -268,12 +288,13 @@ public class MetaToolItem extends SchematicMetaBlockItem
             if (!(tileEntity instanceof RegionTileEntity))
             {
                 player.addChatComponentMessage(new ChatComponentText("Linked Region Block no longer exists."));
+                clearMetaTool(stack, player);
                 return false;
             }
             RegionTileEntity oppositeRegion = (RegionTileEntity) tileEntity;
 
-            selectedRegion.setOppositeWithReverify(oppositeRegion);
-            oppositeRegion.setOppositeWithReverify(selectedRegion);
+            selectedRegion.setLinkedTileEntityWithReverify(oppositeRegion);
+            oppositeRegion.setLinkedTileEntityWithReverify(selectedRegion);
             clearMetaTool(stack, player);
         }
         return true;

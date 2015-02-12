@@ -27,14 +27,13 @@ public class RegionTileEntity extends TileEntity
 
     public boolean isPaired()
     {
-        return oppositeLocation != null;
+        return getLinkedTileEntity() != null;
     }
 
-    public void setOppositeWithReverify(RegionTileEntity newOpposite)
+    public void setLinkedTileEntityWithReverify(RegionTileEntity newOpposite)
     {
         Logger.info("Setting Region Opposite: %s", this);
-        RegionTileEntity currentOpposite = getOpposite();
-
+        RegionTileEntity currentOpposite = getLinkedTileEntity();
 
         this.oppositeLocation = newOpposite == null ? null : newOpposite.getWorldBlockLocation();
         if (currentOpposite != null)
@@ -45,12 +44,12 @@ public class RegionTileEntity extends TileEntity
         sendUpdate();
     }
 
-    public WorldBlockCoord getOppositeLocation()
+    public WorldBlockCoord getLinkedLocation()
     {
         return oppositeLocation;
     }
 
-    public RegionTileEntity getOpposite()
+    public RegionTileEntity getLinkedTileEntity()
     {
         if (oppositeLocation == null) return null;
         TileEntity tileEntity = worldObj.getTileEntity(oppositeLocation.x, oppositeLocation.y, oppositeLocation.z);
@@ -58,10 +57,14 @@ public class RegionTileEntity extends TileEntity
         return (RegionTileEntity) tileEntity;
     }
 
-    public void setOpposite(RegionTileEntity newOpposite)
+    public void setLinkedTileEntity(RegionTileEntity newOpposite)
     {
         Logger.info("Setting Region Opposite: %s", this);
         this.oppositeLocation = newOpposite == null ? null : newOpposite.getWorldBlockLocation();
+        if (worldObj != null && worldObj.isRemote)
+        {
+            sendUpdate();
+        }
     }
 
     @Override
@@ -110,11 +113,11 @@ public class RegionTileEntity extends TileEntity
         readFromNBT(packet.func_148857_g());
     }
 
-    public boolean isPrimaryBlock()
+    public boolean isRenderBlock()
     {
-        final RegionTileEntity opposite = getOpposite();
+        final RegionTileEntity opposite = getLinkedTileEntity();
         if (opposite == null) return false;
-        final WorldBlockCoord other = getOppositeLocation();
+        final WorldBlockCoord other = getLinkedLocation();
         int thisDistance = xCoord * xCoord + yCoord * yCoord + zCoord * zCoord;
         int otherDistance = other.x * other.x + other.y * other.y + other.z * other.z;
 
@@ -163,7 +166,7 @@ public class RegionTileEntity extends TileEntity
         setSchematicNameInternal(schematicName);
         if (isPaired())
         {
-            getOpposite().setSchematicNameInternal(schematicName);
+            getLinkedTileEntity().setSchematicNameInternal(schematicName);
         }
 
     }
