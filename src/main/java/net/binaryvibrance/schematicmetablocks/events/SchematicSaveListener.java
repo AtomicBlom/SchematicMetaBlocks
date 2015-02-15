@@ -4,10 +4,12 @@ import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.api.event.DuplicateMappingException;
 import com.github.lunatrius.schematica.api.event.PostSchematicCaptureEvent;
 import com.github.lunatrius.schematica.api.event.PreSchematicSaveEvent;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
+import net.binaryvibrance.schematicmetablocks.library.Mods;
 import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
@@ -25,6 +27,7 @@ public class SchematicSaveListener
     }
 
     @SubscribeEvent
+    @Optional.Method(modid = Mods.Schematica)
     public void OnSchematicCaptured(PostSchematicCaptureEvent event)
     {
 
@@ -77,6 +80,7 @@ public class SchematicSaveListener
     }
 
     @SubscribeEvent
+    @Optional.Method(modid = Mods.Schematica)
     public void OnSchematicSaving(PreSchematicSaveEvent event)
     {
 

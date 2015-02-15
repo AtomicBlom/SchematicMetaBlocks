@@ -1,14 +1,15 @@
 package net.binaryvibrance.schematicmetablocks.jobs;
 
+import com.google.common.base.Function;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.minecraftforge.event.world.WorldEvent;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.function.Predicate;
 
 public class JobProcessor
 {
@@ -161,17 +162,33 @@ public class JobProcessor
         }
     }
 
-    public void unscheduleJobsIf(JobType jobType, Predicate<IJob> jobIsCorrelated)
+    public void unscheduleJobsIf(JobType jobType, Function<IJob, Boolean> predicate)
     {
         switch (jobType)
         {
             case WORLD_TICK:
-                scheduledTickJobs.removeIf(jobIsCorrelated);
+                removeJobs(scheduledTickJobs, predicate);
                 break;
             case BACKGROUND:
-                scheduledBackgroundJobs.removeIf(jobIsCorrelated);
+                removeJobs(scheduledBackgroundJobs, predicate);
                 break;
         }
+    }
+
+    private void removeJobs(Collection<IJob> jobs, Function<IJob, Boolean> predicate) {
+        LinkedList<IJob> jobsToRemove = new LinkedList<IJob>();
+        for (final IJob iJob : jobs.toArray(new IJob[0]))
+        {
+            if (predicate.apply(iJob)) {
+                jobsToRemove.add(iJob);
+            }
+        }
+
+        for (final IJob job : jobs)
+        {
+            jobs.remove(job);
+        }
+
     }
 }
 

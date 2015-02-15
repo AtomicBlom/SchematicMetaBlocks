@@ -1,5 +1,6 @@
 package net.binaryvibrance.schematicmetablocks.jobs;
 
+import com.google.common.base.Function;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
@@ -13,7 +14,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
 public class ChunkToProcess implements IJob, IWorldJob
 {
@@ -55,10 +55,10 @@ public class ChunkToProcess implements IJob, IWorldJob
         final JobProcessor jobProcessor = JobProcessor.Instance;
 
         final int id = idGenerator.incrementAndGet();
-        final Predicate<IJob> jobIsCorrelated = new Predicate<IJob>()
+        final Function<IJob, Boolean> jobIsCorrelated = new Function<IJob, Boolean>()
         {
             @Override
-            public boolean test(IJob iJob)
+            public Boolean apply(IJob iJob)
             {
                 if (iJob instanceof SetBlock)
                 {
@@ -144,17 +144,18 @@ public class ChunkToProcess implements IJob, IWorldJob
 
         for (int y = 0; y < world.getActualHeight(); ++y)
         {
+            if (_jobObsolete)
+            {
+                Logger.info("Another job was requested, cancelling this one.");
+                jobProcessor.unscheduleJobsIf(JobType.WORLD_TICK, jobIsCorrelated);
+                return;
+            }
+
             for (int x = 0; x < 16; ++x)
             {
+
                 for (int z = 0; z < 16; ++z)
                 {
-                    if (_jobObsolete)
-                    {
-                        Logger.info("Another job was requested, cancelling this one.");
-                        jobProcessor.unscheduleJobsIf(JobType.WORLD_TICK, jobIsCorrelated);
-                        return;
-                    }
-
                     if (processed[createIndex(x, y, z)] == 0 && chunk.getBlock(x, y, z) == ModBlock.blockImplicitAir)
                     {
                         final SetBlock setBlock = new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, Blocks.air, 0);

@@ -98,7 +98,7 @@ public class RecoverSchematicCommand extends CommandBase
                 });
 
                 ResourceLocation schematicLocation = loader.loadSchematic(new File(Minecraft.getMinecraft().mcDataDir, "\\Schematics\\" + filename + ".schematic"));
-                final ISchematicMetadata metadata = loader.getSchematicMetadata(schematicLocation);
+                final SchematicLoader.ISchematicMetadata metadata = loader.getSchematicMetadata(schematicLocation);
 
                 final World world = player.getEntityWorld();
                 loader.renderSchematicInOneShot(schematicLocation, world, (int) player.posX, (int) player.posY, (int) player.posZ, ForgeDirection.NORTH, false);
