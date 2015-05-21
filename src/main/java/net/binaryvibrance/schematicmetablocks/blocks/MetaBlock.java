@@ -12,7 +12,7 @@ public class MetaBlock extends Block
     protected MetaBlock(Material material, boolean addToCreativeTab)
     {
         super(material);
-        if (addToCreativeTab) setCreativeTab(TheMod.CREATIVE_TAB);
+        if (addToCreativeTab && TheMod.creatorMode) setCreativeTab(TheMod.CREATIVE_TAB);
     }
 
     protected MetaBlock(Material material) { this(material, true); }

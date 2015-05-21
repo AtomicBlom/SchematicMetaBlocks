@@ -28,7 +28,7 @@ public final class ModItem
     // * NOTE: @GameRegistry.ObjectHolder requires these fields to have the same name as the unlocalized name of the
     // *       object.
     // *
-    public static final MetaToolItem metaToolItem = new MetaToolItem();
+    public static MetaToolItem metaToolItem;
 
     private ModItem()
     {
@@ -37,6 +37,7 @@ public final class ModItem
 
     public static void init()
     {
+        metaToolItem = new MetaToolItem();
         GameRegistry.registerItem(metaToolItem, MetaToolItem.NAME);
     }
 }

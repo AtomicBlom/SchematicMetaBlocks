@@ -30,12 +30,12 @@ public final class ModBlock
     // * NOTE: @GameRegistry.ObjectHolder requires these fields to have the same name as the unlocalized name of the
     // *       object.
     // *
-    public static final InteriorAirMarker blockInteriorAirMarker = new InteriorAirMarker();
-    public static final ImplicitAirBlock blockImplicitAir = new ImplicitAirBlock();
-    public static final ExplicitAirBlock blockExplicitAir = new ExplicitAirBlock();
-    public static final OriginBlock blockOrigin = new OriginBlock();
-    public static final NullBlock blockNull = new NullBlock();
-    public static final RegionBlock blockRegion = new RegionBlock();
+    public static InteriorAirMarker blockInteriorAirMarker;
+    public static ImplicitAirBlock blockImplicitAir;
+    public static ExplicitAirBlock blockExplicitAir;
+    public static OriginBlock blockOrigin;
+    public static NullBlock blockNull;
+    public static RegionBlock blockRegion;
 
     private ModBlock()
     {
@@ -52,6 +52,12 @@ public final class ModBlock
 
     public static void init()
     {
+        blockInteriorAirMarker = new InteriorAirMarker();
+        blockImplicitAir = new ImplicitAirBlock();
+        blockExplicitAir = new ExplicitAirBlock();
+        blockOrigin = new OriginBlock();
+        blockNull = new NullBlock();
+        blockRegion = new RegionBlock();
 
         GameRegistry.registerBlock(blockInteriorAirMarker, blockInteriorAirMarker.NAME);
         GameRegistry.registerBlock(blockImplicitAir, blockImplicitAir.NAME);

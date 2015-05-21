@@ -34,12 +34,19 @@ public class RecoverSchematicCommand extends CommandBase
         return "smbRecoverSchematic [SchematicName]";
     }
 
+    /**
+     * Return the required permission level for this command.
+     */
+    public int getRequiredPermissionLevel()
+    {
+        return 3;
+    }
+
     @Override
     public void processCommand(ICommandSender sender, String[] args)
     {
         try
         {
-
             if (sender instanceof EntityPlayerMP)
             {
                 if (args.length < 1)
@@ -97,7 +104,7 @@ public class RecoverSchematicCommand extends CommandBase
                     }
                 });
 
-                ResourceLocation schematicLocation = loader.loadSchematic(new File(Minecraft.getMinecraft().mcDataDir, "\\Schematics\\" + filename + ".schematic"));
+                ResourceLocation schematicLocation = loader.loadSchematic(new File(Minecraft.getMinecraft().mcDataDir, "/Schematics/" + filename + ".schematic"));
                 final SchematicLoader.ISchematicMetadata metadata = loader.getSchematicMetadata(schematicLocation);
 
                 final World world = player.getEntityWorld();

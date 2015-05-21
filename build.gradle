@@ -42,6 +42,11 @@ repositories {
         name = 'lunatrius\' ivy repo'
         url 'http://mc.lunatri.us/files'
     }
+    maven
+        {
+            name = "ChickenBones"
+            url = "http://chickenbones.net/maven/"
+        }
 }
 
 dependencies {
@@ -60,6 +65,9 @@ dependencies {
     compile group: 'com.github.lunatrius', name: 'Schematica', version: "1.7.10-1.7.5.110", classifier: 'api'
     runtime group: 'com.github.lunatrius', name: 'Schematica', version: "1.7.10-1.7.5.110", classifier: 'dev'
     runtime group: 'com.github.lunatrius', name: 'LunatriusCore', version: "1.7.10-1.1.2.20", classifier: 'dev'
+    compile 'codechicken:CodeChickenLib:1.7.10-1.1.1.106:dev'
+    compile 'codechicken:CodeChickenCore:1.7.10-1.0.4.29:dev'
+    compile 'codechicken:NotEnoughItems:1.7.10-1.0.3.72:dev'
 }
 
 processResources
@@ -105,3 +113,14 @@ artifacts {
     archives sourceJar
     archives deobfJar
 }
+
+task copyChicken(type: Copy, dependsOn: "extractUserDev") {
+    from { configurations.compile }
+    include "**/*Chicken*.jar", "**/*NotEnoughItems*.jar"
+    exclude "**/CodeChickenLib*" // because CCC downloads it anyways.. -_-
+    into file("./run/mods") // paralell to the assets dir
+    mustRunAfter "deobfBinJar"
+    mustRunAfter "repackMinecraft"
+}
+tasks.setupDevWorkspace.dependsOn copyChicken
+tasks.setupDecompWorkspace.dependsOn copyChicken

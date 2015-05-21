@@ -27,7 +27,9 @@ public class SchematicMetaBlockItem extends Item
 {
     public SchematicMetaBlockItem()
     {
-        setCreativeTab(TheMod.CREATIVE_TAB);
+        if (TheMod.creatorMode) {
+            setCreativeTab(TheMod.CREATIVE_TAB);
+        }
     }
 
     public static String getUnwrappedUnlocalizedName(String unlocalizedName)

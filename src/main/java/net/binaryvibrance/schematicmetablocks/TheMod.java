@@ -22,6 +22,8 @@ import net.binaryvibrance.schematicmetablocks.schematic.RecoverSchematicCommand;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+
 import java.util.Map;
 
 @Mod(modid = TheMod.MOD_ID, name = TheMod.MOD_NAME, version = TheMod.MOD_VERSION)
@@ -32,22 +34,29 @@ public class TheMod
     public static final String MOD_VERSION = "@MOD_VERSION@";
     public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ':';
     @SuppressWarnings("AnonymousInnerClass")
-    public static final CreativeTabs CREATIVE_TAB = new CreativeTabs(MOD_ID.toLowerCase())
-    {
-        @Override
-        public Item getTabIconItem()
-        {
-            return Item.getItemFromBlock(ModBlock.blockExplicitAir);
-        }
-    };
+    public static CreativeTabs CREATIVE_TAB;
     @Mod.Instance(TheMod.MOD_ID)
     public static TheMod instance;
     @SidedProxy(clientSide = "net.binaryvibrance.schematicmetablocks.proxy.ClientProxy", serverSide = "net.binaryvibrance.schematicmetablocks.proxy.CommonProxy")
     public static CommonProxy proxy;
+    public static Configuration configFile;
+    public static boolean creatorMode = true;
 
     @Mod.EventHandler
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
     {
+        configFile = new Configuration(event.getSuggestedConfigurationFile());
+        syncConfig();
+        if (creatorMode) {
+            CREATIVE_TAB = new CreativeTabs(MOD_ID.toLowerCase())
+            {
+                @Override
+                public Item getTabIconItem()
+                {
+                    return Item.getItemFromBlock(ModBlock.blockExplicitAir);
+                }
+            };
+        }
         ModBlock.init();
         ModItem.init();
     }
@@ -78,6 +87,13 @@ public class TheMod
     public boolean checkRemoteVersions(Map<String, String> versions, Side side)
     {
         return true;
+    }
+
+    public static void syncConfig() {
+        creatorMode = configFile.getBoolean("creatorMode", Configuration.CATEGORY_GENERAL, creatorMode, "Turning off Creator mode disables all the blocks and hides the creative tab");
+
+        if(configFile.hasChanged())
+            configFile.save();
     }
 }
 
