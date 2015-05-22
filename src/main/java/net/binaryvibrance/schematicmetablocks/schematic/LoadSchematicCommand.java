@@ -1,12 +1,16 @@
 package net.binaryvibrance.schematicmetablocks.schematic;
 
 import akka.io.Tcp;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
+import cpw.mods.fml.relauncher.Side;
+import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.server.CommandBlockLogic;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -24,7 +28,7 @@ public class LoadSchematicCommand extends CommandBase
     @Override
     public String getCommandUsage(ICommandSender p_71518_1_)
     {
-        return "smb";
+        return "/smbLoadSchematic <schematic> [x] [y] [z]";
     }
 
     /**
@@ -32,12 +36,16 @@ public class LoadSchematicCommand extends CommandBase
      */
     public int getRequiredPermissionLevel()
     {
-        return 3;
+        return 1;
     }
 
     @Override
     public void processCommand(ICommandSender sender, String[] args)
     {
+        if (!(sender instanceof CommandBlockLogic) && !sender.canCommandSenderUseCommand(3, this.getCommandName())) {
+            throw new CommandException("Could not execute command: Permission Denied");
+        }
+
         if (args.length < 1) {
             throw new CommandException("Could not execute command");
         }
@@ -54,7 +62,11 @@ public class LoadSchematicCommand extends CommandBase
 
         SchematicLoader loader = new SchematicLoader();
 
-        ResourceLocation schematicLocation = loader.loadSchematic(new File(Minecraft.getMinecraft().mcDataDir, "/Schematics/" + filename + ".schematic"));
+        if (!filename.endsWith(".schematic")) {
+            filename += ".schematic";
+        }
+
+        ResourceLocation schematicLocation = loader.loadSchematic(new File(TheMod.proxy.getDataDirectory(), "/Schematics/" + filename));
         loader.renderSchematicInOneShot(schematicLocation, sender.getEntityWorld(), (int) x, (int) y, (int) z, ForgeDirection.NORTH, false);
         sender.addChatMessage(new ChatComponentText("Rendered schematic " + filename));
     }

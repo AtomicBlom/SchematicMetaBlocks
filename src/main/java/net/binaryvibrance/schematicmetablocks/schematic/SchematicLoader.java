@@ -1,8 +1,10 @@
 package net.binaryvibrance.schematicmetablocks.schematic;
 
-import com.github.lunatrius.schematica.api.ISchematic;
 import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
 import cpw.mods.fml.common.registry.GameData;
+import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
+import net.binaryvibrance.schematicmetablocks.jobs.JobType;
+import net.binaryvibrance.schematicmetablocks.jobs.RenderWorldJob;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
@@ -270,6 +272,7 @@ public class SchematicLoader
         }
 
         boolean useChunkRendering = true;
+        boolean useJobProcessing = true;
 
 
         if (useChunkRendering)
@@ -283,7 +286,11 @@ public class SchematicLoader
             {
                 for (int chunkZ = chunkZStart; chunkZ <= chunkZEnd; ++chunkZ)
                 {
-                    renderSchematicToSingleChunk(resource, world, x, y, z, chunkX, chunkZ, rotation, flip);
+                    if (!useJobProcessing) {
+                        renderSchematicToSingleChunk(resource, world, x, y, z, chunkX, chunkZ, rotation, flip);
+                    } else {
+                        JobProcessor.Instance.scheduleJob(JobType.WORLD_TICK, new RenderWorldJob(this, resource, world, x, y, z, chunkX, chunkZ, rotation, flip));
+                    }
                 }
             }
         } else

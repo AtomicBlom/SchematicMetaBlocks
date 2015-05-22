@@ -1,6 +1,7 @@
 package net.binaryvibrance.schematicmetablocks.schematic;
 
 import net.binaryvibrance.schematicmetablocks.Logger;
+import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.minecraft.block.Block;
@@ -104,7 +105,12 @@ public class RecoverSchematicCommand extends CommandBase
                     }
                 });
 
-                ResourceLocation schematicLocation = loader.loadSchematic(new File(Minecraft.getMinecraft().mcDataDir, "/Schematics/" + filename + ".schematic"));
+                if (!filename.endsWith(".schematic")) {
+                    filename += ".schematic";
+                }
+
+                ResourceLocation schematicLocation = loader.loadSchematic(new File(TheMod.proxy.getDataDirectory(), "/Schematics/" + filename));
+
                 final SchematicLoader.ISchematicMetadata metadata = loader.getSchematicMetadata(schematicLocation);
 
                 final World world = player.getEntityWorld();
