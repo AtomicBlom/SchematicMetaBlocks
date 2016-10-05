@@ -82,8 +82,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    //compile group: 'com.github.lunatrius', name: 'Schematica', version: "1.7.10-1.7.5.110", classifier: 'api'
-    //runtime group: 'com.github.lunatrius', name: 'Schematica', version: "1.7.10-1.7.5.110", classifier: 'dev'
+    compile group: 'com.github.lunatrius', name: 'Schematica', version: config.minecraft_version + "-" + config.schematica_version, classifier: 'api'
+    runtime group: 'com.github.lunatrius', name: 'Schematica', version: config.minecraft_version + "-" + config.schematica_version, classifier: 'dev'
     //runtime group: 'com.github.lunatrius', name: 'LunatriusCore', version: "1.7.10-1.1.2.20", classifier: 'dev'
 }
 
@@ -99,7 +99,7 @@ processResources
         include '**/*.properties'
                 
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version, 'forge_version': config.forge_version,
+        expand 'version':project.version, 'mcversion':project.minecraft.version, 'forge_version': config.forge_version
     }
         
     // copy everything else, thats not the mcmod.info
