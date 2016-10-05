@@ -1,28 +1,28 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
-import net.binaryvibrance.schematicmetablocks.TheMod;
-import net.binaryvibrance.schematicmetablocks.client.renderer.IBlockWithFloor;
-import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class OriginBlock extends MetaBlock implements IBlockWithFloor
+public class OriginBlock extends Block //implements IBlockWithFloor
 {
     public static final String NAME = "blockOrigin";
-    private IIcon floorIcon;
+    //private IIcon floorIcon;
 
     public OriginBlock()
     {
-        super(Material.glass);
-        this.setBlockName(NAME);
+        super(Material.GLASS);
+        //this.setBlockName(NAME);
     }
 
+    /*
     @Override
     public IIcon getFloorIcon()
     {
@@ -35,24 +35,27 @@ public class OriginBlock extends MetaBlock implements IBlockWithFloor
         super.registerBlockIcons(iconRegister);
         floorIcon = iconRegister.registerIcon(TheMod.MOD_ID + ":originFloor");
     }
-
-    @Override
+    */
+    /*@Override
     public int getRenderType()
     {
         return ClientProxy.originBlockRendererId;
-    }
+    }*/
+
 
     @Override
-    public void addCollisionBoxesToList(World p_149743_1_, int p_149743_2_, int p_149743_3_, int p_149743_4_, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity entity)
+    @Deprecated
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn)
     {
-        if (!(entity instanceof EntityPlayer))
+        if (!(entityIn instanceof EntityPlayer))
         {
-            super.addCollisionBoxesToList(p_149743_1_, p_149743_2_, p_149743_3_, p_149743_4_, p_149743_5_, p_149743_6_, entity);
+            super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
         }
     }
 
     @Override
-    public boolean isOpaqueCube()
+    @Deprecated
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }

@@ -1,34 +1,34 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
-import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class ImplicitAirBlock extends MetaBlock
+public class ImplicitAirBlock extends Block
 {
-    public static final String NAME = "blockImplicitAir";
+    //public static final String NAME = "blockImplicitAir";
 
     public ImplicitAirBlock()
     {
-        super(Material.glass, false);
-        this.setBlockName(NAME);
+        super(Material.GLASS);
+        //this.setBlockName(NAME);
     }
 
-    @Override
+    /*@Override
     public boolean renderAsNormalBlock()
     {
         return false;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public int getRenderType()
     {
         return ClientProxy.insideMetadataBlockRendererId;
@@ -45,51 +45,56 @@ public class ImplicitAirBlock extends MetaBlock
         }
 
         return super.getIcon(world, x, y, z, side);
-    }
+    }*/
 
     @Override
-    public void addCollisionBoxesToList(World p_149743_1_, int p_149743_2_, int p_149743_3_, int p_149743_4_, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity entity)
+    @Deprecated
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn)
     {
-        if (!(entity instanceof EntityPlayer))
+        if (!(entityIn instanceof EntityPlayer))
         {
-            super.addCollisionBoxesToList(p_149743_1_, p_149743_2_, p_149743_3_, p_149743_4_, p_149743_5_, p_149743_6_, entity);
+            super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
         }
-
     }
 
+    @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(World p_149668_1_, int p_149668_2_, int p_149668_3_, int p_149668_4_)
+    @Deprecated
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos)
     {
         return null;
     }
 
     @Override
-    public boolean isOpaqueCube()
-    {
-        return false;
-    }
-
-    public boolean canCollideCheck(int p_149678_1_, boolean p_149678_2_)
+    @Deprecated
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
     @Override
+    public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid)
+    {
+        return false;
+    }
+
+    /*@Override
     public int getRenderBlockPass()
     {
         return 1;
     }
+    */
 
     @Override
-    public boolean isReplaceable(IBlockAccess world, int x, int y, int z)
+    public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos)
     {
         return true;
     }
 
-    @Override
+    /*@Override
     public boolean canRenderInPass(int pass)
     {
         ClientProxy.renderPass = pass;
         return pass != 0;
-    }
+    }*/
 }

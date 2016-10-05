@@ -4,17 +4,18 @@ import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.api.event.DuplicateMappingException;
 import com.github.lunatrius.schematica.api.event.PostSchematicCaptureEvent;
 import com.github.lunatrius.schematica.api.event.PreSchematicSaveEvent;
-import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.library.Mods;
-import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
-import net.minecraft.block.Block;
+import net.binaryvibrance.schematicmetablocks.utility.NBTUtils;
 import net.minecraft.block.BlockAir;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class SchematicSaveListener
 {
@@ -41,36 +42,39 @@ public class SchematicSaveListener
         int interiorAir = 0;
         int exteriorAir = 0;
 
+        BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+
         for (int z = 0; z < length; ++z)
         {
             for (int x = 0; x < width; ++x)
             {
                 for (int y = 0; y < height; ++y)
                 {
-                    final Block block = schematic.getBlock(x, y, z);
+                    mutableBlockPos.setPos(x, y, z);
+                    final IBlockState block = schematic.getBlockState(mutableBlockPos);
                     if (block instanceof ExplicitAirBlock)
                     {
-                        schematic.setBlock(x, y, z, Blocks.air, 0);
+                        schematic.setBlockState(mutableBlockPos, Blocks.AIR.getDefaultState());
                         interiorAir++;
                         //TODO: Add Explicit Air to map of
                     } else if (block instanceof ImplicitAirBlock)
                     {
-                        schematic.setBlock(x, y, z, Blocks.air, 0);
+                        schematic.setBlockState(mutableBlockPos, Blocks.AIR.getDefaultState());
                         interiorAir++;
                     } else if (block instanceof InteriorAirMarker)
                     {
-                        schematic.setBlock(x, y, z, Blocks.air, 0);
-                        schematic.removeTileEntity(x, y, z);
+                        schematic.setBlockState(mutableBlockPos, Blocks.AIR.getDefaultState());
+                        schematic.removeTileEntity(mutableBlockPos);
                         interiorAir++;
                     } else if (block instanceof BlockAir)
                     {
-                        schematic.setBlock(x, y, z, ModBlock.blockNull, 0);
+                        schematic.setBlockState(mutableBlockPos, ModBlock.blockNull.getDefaultState());
                         exteriorAir++;
                     } else if (block instanceof OriginBlock)
                     {
-                        schematic.setBlock(x, y, z, Blocks.air, 0);
+                        schematic.setBlockState(mutableBlockPos, Blocks.AIR.getDefaultState());
                         interiorAir++;
-                        context.origin = new WorldBlockCoord(x, y, z);
+                        context.origin = new BlockPos(x, y, z);
                     }
                 }
             }
@@ -88,7 +92,7 @@ public class SchematicSaveListener
         extendedMetadata.setString("SchematicName", "I dunno, I don't care");
         context.writeTo(extendedMetadata);
 
-        final String nullBlockIdentifier = MetaBlock.getUnwrappedUnlocalizedName(ModBlock.blockNull.getUnlocalizedName());
+        final String nullBlockIdentifier = ModBlock.blockNull.getRegistryName().toString();
         try
         {
             event.replaceMapping(nullBlockIdentifier, "null");
@@ -100,13 +104,13 @@ public class SchematicSaveListener
 
     class SchematicContext
     {
-        WorldBlockCoord origin;
+        BlockPos origin;
 
         public void writeTo(NBTTagCompound extendedMetadata)
         {
             if (origin != null)
             {
-                extendedMetadata.setTag("Origin", origin.toNBT());
+                extendedMetadata.setTag("Origin", NBTUtils.writeBlockPos(origin));
             }
         }
     }

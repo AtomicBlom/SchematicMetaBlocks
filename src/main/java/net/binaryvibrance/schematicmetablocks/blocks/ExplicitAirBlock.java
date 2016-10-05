@@ -2,28 +2,30 @@ package net.binaryvibrance.schematicmetablocks.blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class ExplicitAirBlock extends MetaBlock
+public class ExplicitAirBlock extends Block
 {
-    public static final String NAME = "blockExplicitAir";
-
     public ExplicitAirBlock()
     {
-        super(Material.glass);
-        this.setBlockName(NAME);
+        super(Material.GLASS);
     }
 
     @Override
-    public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side)
+    @Deprecated
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
     {
-        Block b = world.getBlock(x, y, z);
-        if (b instanceof ExplicitAirBlock)
+        IBlockState b = blockAccess.getBlockState(pos);
+        if (b.getBlock() instanceof ExplicitAirBlock)
         {
             return false;
         }
@@ -31,17 +33,19 @@ public class ExplicitAirBlock extends MetaBlock
     }
 
     @Override
-    public void addCollisionBoxesToList(World p_149743_1_, int p_149743_2_, int p_149743_3_, int p_149743_4_, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity entity)
+    @Deprecated
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn)
     {
-        if (!(entity instanceof EntityPlayer))
+        if (!(entityIn instanceof EntityPlayer))
         {
-            super.addCollisionBoxesToList(p_149743_1_, p_149743_2_, p_149743_3_, p_149743_4_, p_149743_5_, p_149743_6_, entity);
+            super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
         }
 
     }
 
     @Override
-    public boolean isOpaqueCube()
+    @Deprecated
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }

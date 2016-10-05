@@ -2,6 +2,7 @@ package net.binaryvibrance.schematicmetablocks.proxy;
 
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +15,8 @@ public class CommonProxy
     }
 
     public File getDataDirectory() {
-        final File file = MinecraftServer.getServer().getFile(".");
+        final MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        final File file = server.getFile(".");
         try {
             return file.getCanonicalFile();
         } catch (IOException e) {

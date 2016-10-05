@@ -1,41 +1,36 @@
 package net.binaryvibrance.schematicmetablocks;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkCheckHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.relauncher.Side;
 import net.binaryvibrance.schematicmetablocks.events.SchematicSaveListener;
 import net.binaryvibrance.schematicmetablocks.events.WorldListener;
 import net.binaryvibrance.schematicmetablocks.gui.GuiHandler;
 import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
-import net.binaryvibrance.schematicmetablocks.library.ModItem;
-import net.binaryvibrance.schematicmetablocks.network.PacketHandler;
+import net.binaryvibrance.schematicmetablocks.network.SetSchematicNameMessage;
+import net.binaryvibrance.schematicmetablocks.network.SetSchematicNameMessageHandler;
 import net.binaryvibrance.schematicmetablocks.proxy.CommonProxy;
 import net.binaryvibrance.schematicmetablocks.schematic.LoadSchematicCommand;
 import net.binaryvibrance.schematicmetablocks.schematic.RecoverSchematicCommand;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
+import net.binaryvibrance.schematicmetablocks.utility.Reference;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.network.NetworkCheckHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.Map;
 
-@Mod(modid = TheMod.MOD_ID, name = TheMod.MOD_NAME, version = TheMod.MOD_VERSION)
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION)
 public class TheMod
 {
-    public static final String MOD_ID = "schematicmetablocks";
-    public static final String MOD_NAME = "Schematic Meta-Blocks";
-    public static final String MOD_VERSION = "@MOD_VERSION@";
-    public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ':';
-    @SuppressWarnings("AnonymousInnerClass")
-    public static CreativeTabs CREATIVE_TAB;
-    @Mod.Instance(TheMod.MOD_ID)
+    public static final SimpleNetworkWrapper CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.MOD_ID);
+    @Mod.Instance(Reference.MOD_ID)
     public static TheMod instance;
     @SidedProxy(clientSide = "net.binaryvibrance.schematicmetablocks.proxy.ClientProxy", serverSide = "net.binaryvibrance.schematicmetablocks.proxy.CommonProxy")
     public static CommonProxy proxy;
@@ -45,20 +40,12 @@ public class TheMod
     @Mod.EventHandler
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
     {
+        CHANNEL.registerMessage(SetSchematicNameMessageHandler.class, SetSchematicNameMessage.class, 0, Side.SERVER);
+
         configFile = new Configuration(event.getSuggestedConfigurationFile());
         syncConfig();
-        if (creatorMode) {
-            CREATIVE_TAB = new CreativeTabs(MOD_ID.toLowerCase())
-            {
-                @Override
-                public Item getTabIconItem()
-                {
-                    return Item.getItemFromBlock(ModBlock.blockExplicitAir);
-                }
-            };
-        }
-        ModBlock.init();
-        ModItem.init();
+        //ModBlock.init();
+        //ModItem.init();
     }
 
     @SuppressWarnings("UnusedParameters")
@@ -78,7 +65,6 @@ public class TheMod
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event)
     {
-        NetworkRegistry.INSTANCE.newChannel(RESOURCE_PREFIX + "Network", new PacketHandler());
         event.registerServerCommand(new LoadSchematicCommand());
         event.registerServerCommand(new RecoverSchematicCommand());
     }

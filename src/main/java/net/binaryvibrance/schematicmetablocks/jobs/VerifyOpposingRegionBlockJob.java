@@ -1,8 +1,8 @@
 package net.binaryvibrance.schematicmetablocks.jobs;
 
 import net.binaryvibrance.schematicmetablocks.Logger;
-import net.binaryvibrance.schematicmetablocks.schematic.WorldBlockCoord;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
@@ -12,7 +12,7 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
     public VerifyOpposingRegionBlockJob(RegionTileEntity regionTileEntity)
     {
 
-        if (!regionTileEntity.hasWorldObj() || regionTileEntity.getWorldObj().isRemote)
+        if (!regionTileEntity.hasWorldObj() || regionTileEntity.getWorld().isRemote)
         {
             throw new UnsupportedOperationException("Attempt to process a tile entity with no world object.");
         }
@@ -24,7 +24,7 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
     {
         final RegionTileEntity opposite = regionTileEntity.getLinkedTileEntity();
         boolean isValid = true;
-        final WorldBlockCoord worldBlockLocation = regionTileEntity.getWorldBlockLocation();
+        final BlockPos worldBlockLocation = regionTileEntity.getPos();
         if (opposite == null || !worldBlockLocation.equals(opposite.getLinkedLocation()))
         {
             isValid = false;
@@ -43,7 +43,7 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
         if (otherJob instanceof VerifyOpposingRegionBlockJob)
         {
             VerifyOpposingRegionBlockJob job = (VerifyOpposingRegionBlockJob) otherJob;
-            return regionTileEntity.getWorldBlockLocation().equals(job.regionTileEntity.getWorldBlockLocation());
+            return regionTileEntity.getPos().equals(job.regionTileEntity.getPos());
         }
         return false;
     }
@@ -57,6 +57,6 @@ public class VerifyOpposingRegionBlockJob implements IJob, IWorldJob
     @Override
     public World getWorld()
     {
-        return regionTileEntity.getWorldObj();
+        return regionTileEntity.getWorld();
     }
 }

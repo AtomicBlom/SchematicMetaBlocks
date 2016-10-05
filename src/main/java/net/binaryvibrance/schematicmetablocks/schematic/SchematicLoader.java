@@ -1,14 +1,10 @@
 package net.binaryvibrance.schematicmetablocks.schematic;
 
-import cpw.mods.fml.common.registry.FMLControlledNamespacedRegistry;
-import cpw.mods.fml.common.registry.GameData;
-import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
-import net.binaryvibrance.schematicmetablocks.jobs.JobType;
-import net.binaryvibrance.schematicmetablocks.jobs.RenderWorldJob;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
-import net.minecraft.command.server.CommandBlockLogic;
+import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,58 +12,59 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityCommandBlock;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.RegistryNamespacedDefaultedByKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.ForgeDirection;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
+import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
+import net.minecraftforge.fml.common.registry.GameData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.util.*;
 
 public class SchematicLoader
 {
-    private static final FMLControlledNamespacedRegistry<Block> BLOCK_REGISTRY = GameData.getBlockRegistry();
+    private static final RegistryNamespacedDefaultedByKey<ResourceLocation, Block> BLOCK_REGISTRY = Block.REGISTRY;
     private static Logger _logger = LogManager.getLogger("SchematicLoader");
-    private Map<ResourceLocation, SchematicWorld> loadedSchematics = new HashMap<ResourceLocation, SchematicWorld>();
+    private Map<ResourceLocation, ISchematic> loadedSchematics = new HashMap<ResourceLocation, ISchematic>();
     private List<ITileEntityLoadedEvent> tileEntityLoadedEventListeners = new LinkedList<ITileEntityLoadedEvent>();
     private List<IPreSetBlockEventListener> setBlockEventListeners;
     private List<IUnknownBlockEventListener> unknownBlockEventListener;
 
     public SchematicLoader()
     {
-        tileEntityLoadedEventListeners.add(new ITileEntityLoadedEvent()
-        {
-            @Override
-            public boolean onTileEntityAdded(TileEntity tileEntity)
+        tileEntityLoadedEventListeners.add(tileEntity -> {
+            if (tileEntity instanceof TileEntityCommandBlock)
             {
-                if (tileEntity instanceof TileEntityCommandBlock)
+                _logger.info("Activating command Block");
+                final World world = tileEntity.getWorld();
+
+                TileEntityCommandBlock commandBlock = (TileEntityCommandBlock) tileEntity;
+                final BlockPos pos = tileEntity.getPos();
+                IBlockState block = world.getBlockState(pos);
+                CommandBlockBaseLogic commandblocklogic = commandBlock.getCommandBlockLogic();
+
+                final GameRules gameRules = commandblocklogic.getServer().worldServers[0].getGameRules();
+                Boolean commandBlockOutputSetting = gameRules.getBoolean("commandBlockOutput");
+                gameRules.setOrCreateGameRule("commandBlockOutput", "false");
+
+                commandblocklogic.trigger(world);
+                world.updateComparatorOutputLevel(pos, block.getBlock());
+
+                if (world.getTileEntity(pos) instanceof TileEntityCommandBlock)
                 {
-                    _logger.info("Activating command Block");
-
-                    final GameRules gameRules = MinecraftServer.getServer().worldServers[0].getGameRules();
-                    Boolean commandBlockOutputSetting = gameRules.getGameRuleBooleanValue("commandBlockOutput");
-                    gameRules.setOrCreateGameRule("commandBlockOutput", "false");
-
-                    final World worldObj = tileEntity.getWorldObj();
-                    TileEntityCommandBlock commandBlock = (TileEntityCommandBlock) tileEntity;
-                    Block block = worldObj.getBlock(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
-                    CommandBlockLogic commandblocklogic = commandBlock.func_145993_a();
-                    commandblocklogic.func_145755_a(worldObj);
-                    worldObj.func_147453_f(commandBlock.xCoord, commandBlock.yCoord, commandBlock.zCoord, block);
-
-                    if (worldObj.getTileEntity(commandBlock.xCoord, commandBlock.yCoord, commandBlock.zCoord) instanceof TileEntityCommandBlock)
-                    {
-                        worldObj.setBlock(commandBlock.xCoord, commandBlock.yCoord, commandBlock.zCoord, Blocks.air, 0, 3);
-                    }
-                    gameRules.setOrCreateGameRule("commandBlockOutput", commandBlockOutputSetting.toString());
-                    return true;
+                    world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
                 }
-                return false;
+                gameRules.setOrCreateGameRule("commandBlockOutput", commandBlockOutputSetting.toString());
+                return true;
             }
+            return false;
         });
     }
 
@@ -145,30 +142,29 @@ public class SchematicLoader
     }
 
     public void renderSchematicToSingleChunk(ResourceLocation resource, World world,
-                                             int originX, int originY, int originZ,
-                                             int chunkX, int chunkZ, ForgeDirection rotation, boolean flip)
+                                             BlockPos origin,
+                                             int chunkX, int chunkZ, EnumFacing rotation, boolean flip)
     {
-        if (rotation == ForgeDirection.DOWN || rotation == ForgeDirection.UP)
+        if (rotation == EnumFacing.DOWN || rotation == EnumFacing.UP)
         {
             _logger.error("Unable to load schematic %s, invalid rotation specified: %s", resource, rotation);
             return;
         }
 
-        SchematicWorld schematic = loadedSchematics.get(resource);
+        ISchematic schematic = loadedSchematics.get(resource);
         if (schematic == null)
         {
             _logger.error("schematic %s was not loaded", resource);
             return;
         }
 
-        _logger.info(String.format("%s - Rendering Chunk (%d, %d) ", System.currentTimeMillis(), chunkX, chunkZ));
 
-        final int minX = originX;
-        final int maxX = originX + schematic.getWidth();
-        final int minY = originY;
-        final int maxY = originY + schematic.getHeight();
-        final int minZ = originZ;
-        final int maxZ = originZ + schematic.getLength();
+        final int minX = origin.getX();
+        final int maxX = minX + schematic.getWidth();
+        final int minY = origin.getY();
+        final int maxY = minY + schematic.getHeight();
+        final int minZ = origin.getZ();
+        final int maxZ = minZ + schematic.getLength();
 
         final int localMinX = minX < (chunkX << 4) ? 0 : (minX & 15);
         final int localMaxX = maxX > ((chunkX << 4) + 15) ? 15 : (maxX & 15);
@@ -178,7 +174,7 @@ public class SchematicLoader
         Chunk c = world.getChunkFromChunkCoords(chunkX, chunkZ);
 
         int blockCount = 0;
-        Block ignore = Blocks.air;
+        Block ignore = Blocks.AIR;
 
         LinkedList<TileEntity> createdTileEntities = new LinkedList<TileEntity>();
 
@@ -198,11 +194,11 @@ public class SchematicLoader
 
                     try
                     {
-                        WorldBlockCoord worldCoord = new WorldBlockCoord(chunkX << 4 | chunkLocalX, y, chunkZ << 4 | chunkLocalZ);
-                        WorldBlockCoord schematicCoord = new WorldBlockCoord(schematicX, schematicY, schematicZ);
+                        BlockPos worldCoord = new BlockPos(x, y, z);
+                        BlockPos schematicCoord = new BlockPos(schematicX, schematicY, schematicZ);
                         PreSetBlockEvent event = new PreSetBlockEvent(schematic, world, worldCoord, schematicCoord);
 
-                        if (setBlockEventListeners != null)
+                        if (event.blockState != null && setBlockEventListeners != null)
                         {
                             for (final IPreSetBlockEventListener listener : setBlockEventListeners)
                             {
@@ -210,15 +206,18 @@ public class SchematicLoader
                             }
                         }
 
-                        if (event.block != null && c.func_150807_a(chunkLocalX, y, chunkLocalZ, event.block, event.metadata))
+                        if (event.shouldSetBlock() && event.blockState != null && c.setBlockState(worldCoord, event.blockState) != null)
                         {
-                            world.markBlockForUpdate(x, y, z);
-                            final NBTTagCompound tileEntityData = schematic.getTileEntity(schematicX, schematicY, schematicZ);
-                            if (event.block.hasTileEntity(event.metadata) && tileEntityData != null)
+                            //TODO: Is this still needed?
+                            //world.markBlockForUpdate(new BlockPos(x, y, z));
+                            final NBTTagCompound tileEntityData = schematic.getTileEntity(schematicCoord);
+                            final Block block = event.blockState.getBlock();
+                            if (block.hasTileEntity(event.blockState) && tileEntityData != null)
                             {
-                                TileEntity tileEntity = TileEntity.createAndLoadEntity(tileEntityData);
+                                MinecraftServer unused = null;
+                                TileEntity tileEntity = TileEntity.create(world, tileEntityData);
 
-                                c.func_150812_a(chunkLocalX, y, chunkLocalZ, tileEntity);
+                                c.addTileEntity(new BlockPos(chunkLocalX, y, chunkLocalZ), tileEntity);
                                 tileEntity.getBlockType();
                                 try
                                 {
@@ -254,17 +253,17 @@ public class SchematicLoader
         c.setChunkModified();
     }
 
-    public void renderSchematicInOneShot(ResourceLocation resource, World world, int x, int y, int z, ForgeDirection rotation, boolean flip)
+    public void renderSchematicInOneShot(ResourceLocation resource, World world, BlockPos pos, EnumFacing rotation, boolean flip)
     {
         long start = System.currentTimeMillis();
 
-        if (rotation == ForgeDirection.DOWN || rotation == ForgeDirection.UP)
+        if (rotation == EnumFacing.DOWN || rotation == EnumFacing.UP)
         {
             _logger.error("Unable to load schematic %s, invalid rotation specified: %s", resource, rotation);
             return;
         }
 
-        SchematicWorld schematic = loadedSchematics.get(resource);
+        ISchematic schematic = loadedSchematics.get(resource);
         if (schematic == null)
         {
             _logger.error("schematic %s was not loaded", resource);
@@ -272,25 +271,20 @@ public class SchematicLoader
         }
 
         boolean useChunkRendering = true;
-        boolean useJobProcessing = true;
 
 
         if (useChunkRendering)
         {
-            int chunkXStart = x >> 4;
-            int chunkXEnd = ((x + schematic.getWidth()) >> 4) + 1;
-            int chunkZStart = z >> 4;
-            int chunkZEnd = ((z + schematic.getLength()) >> 4) + 1;
+            int chunkXStart = pos.getX() >> 4;
+            int chunkXEnd = ((pos.getX() + schematic.getWidth()) >> 4) + 1;
+            int chunkZStart = pos.getZ() >> 4;
+            int chunkZEnd = ((pos.getZ() + schematic.getLength()) >> 4) + 1;
 
             for (int chunkX = chunkXStart; chunkX <= chunkXEnd; ++chunkX)
             {
                 for (int chunkZ = chunkZStart; chunkZ <= chunkZEnd; ++chunkZ)
                 {
-                    if (!useJobProcessing) {
-                        renderSchematicToSingleChunk(resource, world, x, y, z, chunkX, chunkZ, rotation, flip);
-                    } else {
-                        JobProcessor.Instance.scheduleJob(JobType.WORLD_TICK, new RenderWorldJob(this, resource, world, x, y, z, chunkX, chunkZ, rotation, flip));
-                    }
+                    renderSchematicToSingleChunk(resource, world, pos, chunkX, chunkZ, rotation, flip);
                 }
             }
         } else
@@ -304,14 +298,12 @@ public class SchematicLoader
                 {
                     for (int schematicY = 0; schematicY < schematic.getHeight(); ++schematicY)
                     {
-                        final int xPos = schematicX + x;
-                        final int yPos = schematicY + y;
-                        final int zPos = schematicZ + z;
-                        Block block = schematic.getBlock(schematicX, schematicY, schematicZ);
-                        if (block != Blocks.air)
+                        final BlockPos worldCoord = pos.add(schematicX, schematicY, schematicZ);
+
+                        IBlockState blockState = schematic.getBlockState(worldCoord);
+                        if (blockState.getBlock() != Blocks.AIR)
                         {
-                            WorldBlockCoord worldCoord = new WorldBlockCoord(xPos, yPos, zPos);
-                            WorldBlockCoord schematicCoord = new WorldBlockCoord(schematicX, schematicY, schematicZ);
+                            BlockPos schematicCoord = new BlockPos(schematicX, schematicY, schematicZ);
                             PreSetBlockEvent event = new PreSetBlockEvent(schematic, world, worldCoord, schematicCoord);
 
                             if (setBlockEventListeners != null)
@@ -322,7 +314,7 @@ public class SchematicLoader
                                 }
                             }
 
-                            world.setBlock(xPos, yPos, zPos, event.block, event.metadata, 2);
+                            world.setBlockState(worldCoord, event.blockState, 2);
                         }
                     }
                 }
@@ -331,8 +323,9 @@ public class SchematicLoader
             _logger.info(String.format("%s - Creating Tile Entities", System.currentTimeMillis()));
             for (NBTTagCompound entity : schematic.getTileEntityData())
             {
-                TileEntity tileEntity = TileEntity.createAndLoadEntity(entity);
-                world.setTileEntity(tileEntity.xCoord + x, tileEntity.yCoord + y, tileEntity.zCoord + z, tileEntity);
+                MinecraftServer unused = null;
+                TileEntity tileEntity = TileEntity.create(world, entity);
+                world.setTileEntity(tileEntity.getPos().add(pos), tileEntity);
                 tileEntity.getBlockType();
                 try
                 {
@@ -417,12 +410,15 @@ public class SchematicLoader
         {
             NBTTagCompound mapping = tagCompound.getCompoundTag(Names.NBT.MAPPING_SCHEMATICA);
             @SuppressWarnings("unchecked")
-            Set<String> names = mapping.func_150296_c();
+            Set<String> names = mapping.getKeySet();
             for (String name : names)
             {
-                if (GameData.getBlockRegistry().containsKey(name))
+                ResourceLocation resourceLocation = new ResourceLocation(name);
+
+                final Block block = Block.REGISTRY.getObjectBypass(resourceLocation);
+                if (block != null)
                 {
-                    final short id1 = (short) GameData.getBlockRegistry().getId(name);
+                    final short id1 = (short) Block.REGISTRY.getIDForObjectBypass(block);
                     oldToNew.put(mapping.getShort(name), id1);
                 } else
                 {
@@ -467,7 +463,7 @@ public class SchematicLoader
             }
         }
 
-        Map<WorldBlockCoord, NBTTagCompound> tileEntities = new HashMap<WorldBlockCoord, NBTTagCompound>();
+        Map<BlockPos, NBTTagCompound> tileEntities = new HashMap<BlockPos, NBTTagCompound>();
         NBTTagList tileEntitiesList = tagCompound.getTagList(Names.NBT.TILE_ENTITIES, Constants.NBT.TAG_COMPOUND);
 
         for (int i = 0; i < tileEntitiesList.tagCount(); i++)
@@ -482,7 +478,7 @@ public class SchematicLoader
                     int y = tileEntity.getInteger("y");
                     int z = tileEntity.getInteger("z");
 
-                    WorldBlockCoord loc = WorldBlockCoord.of(x, y, z);
+                    BlockPos loc = new BlockPos(x, y, z);
 
                     tileEntities.put(loc, tileEntity);
                 }
@@ -524,9 +520,9 @@ public class SchematicLoader
         void unknownBlock(UnknownBlockEvent event);
     }
 
-    public static class SchematicWorld implements ISchematicMetadata
+    public static class SchematicWorld implements ISchematic
     {
-        private final Map<WorldBlockCoord, NBTTagCompound> tileEntities = new HashMap<WorldBlockCoord, NBTTagCompound>();
+        private final Map<BlockPos, NBTTagCompound> tileEntities = new HashMap<BlockPos, NBTTagCompound>();
         private NBTTagCompound extendedMetadata;
         private short[] blocks;
         private byte[] metadata;
@@ -544,7 +540,7 @@ public class SchematicLoader
             this.length = 0;
         }
 
-        public SchematicWorld(short[] blocks, byte[] metadata, Map<WorldBlockCoord, NBTTagCompound> tileEntities, short width, short height, short length, NBTTagCompound extendedMetadata)
+        public SchematicWorld(short[] blocks, byte[] metadata, Map<BlockPos, NBTTagCompound> tileEntities, short width, short height, short length, NBTTagCompound extendedMetadata)
         {
             this();
             this.extendedMetadata = extendedMetadata;
@@ -562,37 +558,35 @@ public class SchematicLoader
             }
         }
 
-        public Block getBlock(int x, int y, int z)
+        @Override
+        public IBlockState getBlockState(BlockPos pos)
         {
+            int x = pos.getX();
+            int y = pos.getY();
+            int z = pos.getZ();
+
             if (x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.height || z >= this.length)
             {
                 //return BLOCK_REGISTRY.getObjectById(0);
                 return null;
             }
             int index = x + (y * length + z) * width;
+            int metadata = this.metadata[index];
             final short blockId = this.blocks[index];
 
-            if (!BLOCK_REGISTRY.containsId(blockId))
+            Block block = BLOCK_REGISTRY.getObjectByIdBypass(blockId);
+            if (block == null)
             {
                 return null;
             }
-            return BLOCK_REGISTRY.getObjectById(blockId);
+            return block.getStateFromMeta(metadata);
         }
 
-        public int getBlockMetadata(int x, int y, int z)
+        @Override
+        public boolean isAirBlock(BlockPos pos)
         {
-            if (x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.height || z >= this.length)
-            {
-                return 0;
-            }
-            int index = x + (y * length + z) * width;
-            return this.metadata[index];
-        }
-
-        public boolean isAirBlock(int x, int y, int z)
-        {
-            Block block = getBlock(x, y, z);
-            return block == null || block.isAir(null, x, y, z);
+            IBlockState blockState = getBlockState(pos);
+            return blockState == null || blockState.getBlock().isAir(blockState, null, pos);
         }
 
         @Override
@@ -616,17 +610,20 @@ public class SchematicLoader
         @Override
         public NBTTagCompound getExtendedMetadata()
         {
-            return (NBTTagCompound) extendedMetadata.copy();
+
+            return extendedMetadata != null ? (NBTTagCompound) extendedMetadata.copy() : null;
         }
 
+        @Override
         public Collection<NBTTagCompound> getTileEntityData()
         {
             return this.tileEntities.values();
         }
 
-        public NBTTagCompound getTileEntity(int x, int y, int z)
+        @Override
+        public NBTTagCompound getTileEntity(BlockPos pos)
         {
-            return tileEntities.get(WorldBlockCoord.of(x, y, z));
+            return tileEntities.get(pos);
         }
     }
 
@@ -647,59 +644,6 @@ public class SchematicLoader
         }
     }
 
-    public static class WorldBlockCoord implements Comparable<WorldBlockCoord>
-    {
-        private final ImmutableTriple<Integer, Integer, Integer> data;
-
-        private WorldBlockCoord(int x, int y, int z) { data = ImmutableTriple.of(x, y, z); }
-
-        public static WorldBlockCoord of(int x, int y, int z) { return new WorldBlockCoord(x, y, z); }
-
-        public int getX() { return data.left; }
-
-        public int getY() { return data.middle; }
-
-        public int getZ() { return data.right; }
-
-        @Override
-        public int hashCode()
-        {
-            return com.google.common.base.Objects.hashCode(data.left, data.middle, data.right);
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            final WorldBlockCoord that = (WorldBlockCoord) o;
-            return data.left.equals(that.data.left)
-                    && data.middle.equals(that.data.middle)
-                    && data.right.equals(that.data.right);
-        }
-
-        @Override
-        public String toString()
-        {
-            return com.google.common.base.Objects.toStringHelper(this)
-                    .add("X", data.left)
-                    .add("Y", data.middle)
-                    .add("Z", data.right)
-                    .toString();
-        }
-
-        @Override
-        public int compareTo(WorldBlockCoord o)
-        {
-            if (data.left.equals(o.data.left)) return data.middle.equals(o.data.middle)
-                    ? data.right.compareTo(o.data.right)
-                    : data.middle.compareTo(o.data.middle);
-
-            else return data.left.compareTo(o.data.left);
-        }
-    }
-
     public interface ISchematicMetadata
     {
         int getWidth();
@@ -711,6 +655,16 @@ public class SchematicLoader
         NBTTagCompound getExtendedMetadata();
     }
 
+    public interface ISchematic extends ISchematicMetadata
+    {
+        IBlockState getBlockState(BlockPos pos);
+
+        boolean isAirBlock(BlockPos pos);
+
+        Collection<NBTTagCompound> getTileEntityData();
+
+        NBTTagCompound getTileEntity(BlockPos pos);
+    }
 
     public class UnknownBlockEvent
     {
@@ -739,37 +693,37 @@ public class SchematicLoader
 
     public class PreSetBlockEvent
     {
-        public final SchematicWorld schematic;
+        public final ISchematic schematic;
         public final World world;
-        public final WorldBlockCoord worldCoord;
-        public final WorldBlockCoord schematicCoord;
-        private int metadata;
-        private Block block;
+        public final BlockPos worldCoord;
+        public final BlockPos schematicCoord;
+        private IBlockState blockState;
+        private boolean shouldSetBlock = true;
 
-        public PreSetBlockEvent(SchematicWorld schematic, World world, WorldBlockCoord worldCoord, WorldBlockCoord schematicCoord)
+        public PreSetBlockEvent(ISchematic schematic, World world, BlockPos worldCoord, BlockPos schematicCoord)
         {
-            this.block = schematic.getBlock(schematicCoord.getX(), schematicCoord.getY(), schematicCoord.getZ());
-            this.metadata = schematic.getBlockMetadata(schematicCoord.getX(), schematicCoord.getY(), schematicCoord.getZ());
+            this.blockState = schematic.getBlockState(schematicCoord);
             this.schematic = schematic;
             this.world = world;
             this.worldCoord = worldCoord;
             this.schematicCoord = schematicCoord;
         }
 
-        public Block getBlock()
+        public IBlockState getBlockState()
         {
-            return block;
+            return blockState;
         }
 
-        public int getMetadata()
+        public void replaceBlockState(IBlockState blockState)
         {
-            return metadata;
+            this.blockState = blockState;
+        }
+        public void cancelSetBlock() {
+            shouldSetBlock = false;
         }
 
-        public void replaceBlock(Block replacementBlock, int metadata)
-        {
-            this.block = replacementBlock;
-            this.metadata = metadata;
+        public boolean shouldSetBlock() {
+            return shouldSetBlock;
         }
     }
 

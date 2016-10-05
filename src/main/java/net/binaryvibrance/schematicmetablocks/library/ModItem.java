@@ -16,28 +16,33 @@
 
 package net.binaryvibrance.schematicmetablocks.library;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.items.MetaToolItem;
+import net.binaryvibrance.schematicmetablocks.utility.Reference;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
-@GameRegistry.ObjectHolder(TheMod.MOD_ID)
+@GameRegistry.ObjectHolder(Reference.MOD_ID)
 public final class ModItem
 {
     // *******
     // * NOTE: @GameRegistry.ObjectHolder requires these fields to have the same name as the unlocalized name of the
     // *       object.
     // *
-    public static MetaToolItem metaToolItem;
+    public static final MetaToolItem metaToolItem;
 
     private ModItem()
     {
         throw new AssertionError();
     }
 
-    public static void init()
+    static {
+        metaToolItem = null;
+    }
+
+    /*public static void init()
     {
         metaToolItem = new MetaToolItem();
         GameRegistry.registerItem(metaToolItem, MetaToolItem.NAME);
-    }
+    }*/
 }

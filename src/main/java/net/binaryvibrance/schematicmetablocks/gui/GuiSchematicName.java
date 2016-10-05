@@ -1,19 +1,18 @@
 package net.binaryvibrance.schematicmetablocks.gui;
 
-import io.netty.buffer.Unpooled;
-import net.binaryvibrance.schematicmetablocks.Logger;
-import net.binaryvibrance.schematicmetablocks.TheMod;
-import net.binaryvibrance.schematicmetablocks.network.PacketType;
+import net.binaryvibrance.schematicmetablocks.network.SetSchematicNameMessage;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.C17PacketCustomPayload;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
+import java.io.IOException;
+
+import static net.binaryvibrance.schematicmetablocks.TheMod.CHANNEL;
 
 public class GuiSchematicName extends GuiScreen
 {
@@ -42,7 +41,7 @@ public class GuiSchematicName extends GuiScreen
         this.y = y;
         this.z = z;
 
-        this.regionTileEntity = RegionTileEntity.tryGetTileEntity(world, x, y, z);
+        this.regionTileEntity = RegionTileEntity.tryGetTileEntity(world, new BlockPos(x, y, z));
 
     }
 
@@ -82,7 +81,7 @@ public class GuiSchematicName extends GuiScreen
     /**
      * Called when the mouse is clicked.
      */
-    protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_)
+    protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_) throws IOException
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
         this.commandTextField.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
@@ -97,7 +96,14 @@ public class GuiSchematicName extends GuiScreen
                 this.mc.displayGuiScreen(null);
             } else if (button.id == 0)
             {
-                //this.regionTileEntity.setSchematicName(this.commandTextField.getText());
+                final SetSchematicNameMessage message = new SetSchematicNameMessage(
+                        this.regionTileEntity.getWorld().provider.getDimension(),
+                        regionTileEntity.getPos(),
+                        this.commandTextField.getText()
+                );
+                CHANNEL.sendToServer(message);
+
+                /*/this.regionTileEntity.setSchematicName(this.commandTextField.getText());
                 PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
 
                 try
@@ -111,29 +117,12 @@ public class GuiSchematicName extends GuiScreen
                     packetbuffer.writeStringToBuffer(this.commandTextField.getText());
 
 
-                    C17PacketCustomPayload packet = new C17PacketCustomPayload(TheMod.RESOURCE_PREFIX + "Network", packetbuffer);
+                    CPacketCustomPayload packet = new CPacketCustomPayload(TheMod.RESOURCE_PREFIX + "Network", packetbuffer);
                     this.mc.getNetHandler().addToSendQueue(packet);
                 } catch (Exception exception)
                 {
                     Logger.severe("Couldn\'t send schematic name info", exception);
                 } finally
-                {
-                    packetbuffer.release();
-                }
-                //PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
-
-                /*try
-                {
-                    packetbuffer.writeByte(this.localCommandBlock.func_145751_f());
-                    this.localCommandBlock.func_145757_a(packetbuffer);
-                    packetbuffer.writeStringToBuffer(this.commandTextField.getText());
-                    this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload("MC|AdvCdm", packetbuffer));
-                }
-                catch (Exception exception)
-                {
-                    field_146488_a.error("Couldn\'t send command block info", exception);
-                }
-                finally
                 {
                     packetbuffer.release();
                 }*/
@@ -152,7 +141,7 @@ public class GuiSchematicName extends GuiScreen
         this.buttonList.clear();
         this.buttonList.add(this.doneBtn = new GuiButton(0, this.width / 2 - 4 - 150, this.height / 4 + 120 + 12, 150, 20, I18n.format("gui.done", new Object[0])));
         this.buttonList.add(this.cancelBtn = new GuiButton(1, this.width / 2 + 4, this.height / 4 + 120 + 12, 150, 20, I18n.format("gui.cancel", new Object[0])));
-        this.commandTextField = new GuiTextField(this.fontRendererObj, this.width / 2 - 150, 50, 245, 20);
+        this.commandTextField = new GuiTextField(1, this.fontRendererObj, this.width / 2 - 150, 50, 245, 20);
         this.commandTextField.setMaxStringLength(128);
         this.commandTextField.setFocused(true);
         String currentSchematicName = regionTileEntity.getSchematicName();

@@ -4,18 +4,21 @@ import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.TheMod;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
+import net.binaryvibrance.schematicmetablocks.utility.NBTUtils;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +47,7 @@ public class RecoverSchematicCommand extends CommandBase
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args)
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args)
     {
         try
         {
@@ -56,52 +59,45 @@ public class RecoverSchematicCommand extends CommandBase
                 }
                 String filename = args[0];
 
-                final List<WorldBlockCoord> blocksToExamine = new LinkedList<WorldBlockCoord>();
+                final List<BlockPos> blocksToExamine = new LinkedList<BlockPos>();
 
                 final EntityPlayerMP player = (EntityPlayerMP) sender;
 
                 SchematicLoader loader = new SchematicLoader();
 
-                WorldBlockCoord playerPosition = new WorldBlockCoord((int)player.posX, (int)player.posY, (int)player.posZ);
+                BlockPos playerPosition = new BlockPos((int)player.posX, (int)player.posY, (int)player.posZ);
 
                 loader.addSetBlockEventListener(new SchematicLoader.IPreSetBlockEventListener()
                 {
                     @Override
                     public void preBlockSet(SchematicLoader.PreSetBlockEvent event)
                     {
-                        if (event.getBlock() == Blocks.air)
+                        if (event.getBlockState().getBlock() == Blocks.AIR)
                         {
-                            for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS)
+                            for (final EnumFacing direction : EnumFacing.VALUES)
                             {
-                                Block schematicBlock = event.schematic.getBlock(
-                                        event.schematicCoord.getX() + direction.offsetX,
-                                        event.schematicCoord.getY() + direction.offsetY,
-                                        event.schematicCoord.getZ() + direction.offsetZ
-                                );
+                                final IBlockState blockState = event.schematic.getBlockState(event.schematicCoord.offset(direction));
+                                Block schematicBlock = blockState.getBlock();
                                 if (schematicBlock == null || schematicBlock == ModBlock.blockNull)
                                 {
-                                    event.replaceBlock(ModBlock.blockExplicitAir, 0);
+                                    event.replaceBlockState(ModBlock.blockExplicitAir.getDefaultState());
                                     return;
                                 }
                             }
-                            event.replaceBlock(ModBlock.blockImplicitAir, 0);
-                            blocksToExamine.add(new WorldBlockCoord(event.worldCoord.getX(), event.worldCoord.getY(), event.worldCoord.getZ()));
+                            event.replaceBlockState(ModBlock.blockImplicitAir.getDefaultState());
+                            blocksToExamine.add(new BlockPos(event.worldCoord.getX(), event.worldCoord.getY(), event.worldCoord.getZ()));
 
-                        } else if (event.getBlock() == ModBlock.blockNull)
+                        } else if (event.getBlockState().getBlock() == ModBlock.blockNull)
                         {
-                            event.replaceBlock(Blocks.air, 0);
+                            event.replaceBlockState(Blocks.AIR.getDefaultState());
                         }
                     }
                 });
-                loader.addUnknownBlockEventListener(new SchematicLoader.IUnknownBlockEventListener()
+                loader.addUnknownBlockEventListener(event ->
                 {
-                    @Override
-                    public void unknownBlock(SchematicLoader.UnknownBlockEvent event)
+                    if ("null".equals(event.name))
                     {
-                        if ("null".equals(event.name))
-                        {
-                            event.remap(ModBlock.blockNull);
-                        }
+                        event.remap(ModBlock.blockNull);
                     }
                 });
 
@@ -114,26 +110,26 @@ public class RecoverSchematicCommand extends CommandBase
                 final SchematicLoader.ISchematicMetadata metadata = loader.getSchematicMetadata(schematicLocation);
 
                 final World world = player.getEntityWorld();
-                loader.renderSchematicInOneShot(schematicLocation, world, (int) player.posX, (int) player.posY, (int) player.posZ, ForgeDirection.NORTH, false);
-                WorldBlockCoord originBlockCoord = null;
+                loader.renderSchematicInOneShot(schematicLocation, world, playerPosition, EnumFacing.NORTH, false);
+                BlockPos originBlockCoord = null;
                 final NBTTagCompound extendedMetadata = metadata.getExtendedMetadata();
                 if (extendedMetadata.hasKey("Origin")) {
                     NBTTagCompound originNBT = extendedMetadata.getCompoundTag("Origin");
-                    originBlockCoord = WorldBlockCoord.fromNBT(originNBT).offset(playerPosition);
+                    originBlockCoord = NBTUtils.readBlockPos(originNBT).add(playerPosition);
 
-                    originBlockCoord.setBlock(world, ModBlock.blockOrigin);
+                    world.setBlockState(originBlockCoord, ModBlock.blockOrigin.getDefaultState());
                 }
 
                 while (!blocksToExamine.isEmpty())
                 {
-                    Stack<WorldBlockCoord> contiguousBlocks = new Stack<WorldBlockCoord>();
-                    List<WorldBlockCoord> blocksInGroup = new LinkedList<WorldBlockCoord>();
-                    WorldBlockCoord blockToExamine = blocksToExamine.get(0);
+                    Stack<BlockPos> contiguousBlocks = new Stack<>();
+                    List<BlockPos> blocksInGroup = new LinkedList<>();
+                    BlockPos blockToExamine = blocksToExamine.get(0);
 
                     contiguousBlocks.push(blockToExamine);
                     blocksInGroup.add(blockToExamine);
 
-                    WorldBlockCoord candidateAirMarker = null;
+                    BlockPos candidateAirMarker = null;
 
                     while (!contiguousBlocks.empty())
                     {
@@ -142,12 +138,13 @@ public class RecoverSchematicCommand extends CommandBase
                             continue;
                         }
 
-                        for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS)
+                        for (final EnumFacing direction : EnumFacing.VALUES)
                         {
-                            WorldBlockCoord neighbourBlockToExamine = blockToExamine.offset(direction);
-                            Block b = neighbourBlockToExamine.getBlock(world);
+                            BlockPos neighbourBlockToExamine = blockToExamine.offset(direction);
+                            final IBlockState blockState = world.getBlockState(neighbourBlockToExamine);
+                            Block b = blockState.getBlock();
 
-                            if (b == ModBlock.blockImplicitAir && neighbourBlockToExamine.chunkX == blockToExamine.chunkX && neighbourBlockToExamine.chunkZ == blockToExamine.chunkZ)
+                            if (b == ModBlock.blockImplicitAir && (neighbourBlockToExamine.getX() >> 4) == (blockToExamine.getX() >> 4) && (neighbourBlockToExamine.getZ() >> 4) == (blockToExamine.getZ() >> 4))
                             {
                                 if (blocksToExamine.contains(neighbourBlockToExamine) && !blocksInGroup.contains(neighbourBlockToExamine))
                                 {
@@ -157,11 +154,13 @@ public class RecoverSchematicCommand extends CommandBase
                             }
                         }
 
-                        if (candidateAirMarker == null & blockToExamine.y > 0)
+                        if (candidateAirMarker == null & blockToExamine.getY() > 0)
                         {
-                            Block blockBelow = blockToExamine.offset(0, -1, 0).getBlock(world);
-                            Block block = blockToExamine.getBlock(world);
-                            if (block == Blocks.air && blockBelow != Blocks.air && blockBelow != ModBlock.blockExplicitAir && blockBelow != ModBlock.blockImplicitAir)
+                            final IBlockState blockStateBelow = world.getBlockState(blockToExamine.down());
+                            Block blockBelow = blockStateBelow.getBlock();
+                            final IBlockState blockState = world.getBlockState(blockToExamine);
+                            Block block = blockState.getBlock();
+                            if (block == Blocks.AIR && blockBelow != Blocks.AIR && blockBelow != ModBlock.blockExplicitAir && blockBelow != ModBlock.blockImplicitAir)
                             {
                                 candidateAirMarker = blockToExamine;
                             }
@@ -176,23 +175,23 @@ public class RecoverSchematicCommand extends CommandBase
                     blocksToExamine.removeAll(blocksInGroup);
                     if (candidateAirMarker != null)
                     {
-                        candidateAirMarker.setBlock(world, ModBlock.blockInteriorAirMarker);
+                        world.setBlockState(candidateAirMarker, ModBlock.blockInteriorAirMarker.getDefaultState());
                     }
                 }
 
-                final WorldBlockCoord cornerA = playerPosition.offset(-1, -1, -1);
-                final WorldBlockCoord cornerB = playerPosition.offset(metadata.getWidth(), metadata.getHeight(), metadata.getLength());
-                cornerA.setBlock(world, ModBlock.blockRegion);
-                cornerB.setBlock(world, ModBlock.blockRegion);
+                final BlockPos cornerA = playerPosition.add(-1, -1, -1);
+                final BlockPos cornerB = playerPosition.add(metadata.getWidth(), metadata.getHeight(), metadata.getLength());
+                world.setBlockState(cornerA, ModBlock.blockRegion.getDefaultState());
+                world.setBlockState(cornerB, ModBlock.blockRegion.getDefaultState());
 
-                RegionTileEntity regionTileEntityA = RegionTileEntity.tryGetTileEntity(world, cornerA.x, cornerA.y, cornerA.z);
-                RegionTileEntity regionTileEntityB = RegionTileEntity.tryGetTileEntity(world, cornerB.x, cornerB.y, cornerB.z);
+                RegionTileEntity regionTileEntityA = RegionTileEntity.tryGetTileEntity(world, cornerA);
+                RegionTileEntity regionTileEntityB = RegionTileEntity.tryGetTileEntity(world, cornerB);
                 regionTileEntityA.setLinkedTileEntity(regionTileEntityB);
                 regionTileEntityB.setLinkedTileEntity(regionTileEntityA);
                 regionTileEntityA.setSchematicName(filename);
                 regionTileEntityB.setSchematicName(filename);
 
-                sender.addChatMessage(new ChatComponentText("Rendered schematic " + filename));
+                sender.addChatMessage(new TextComponentString("Rendered schematic " + filename));
             }
         } catch (Exception e) {
             Logger.info(e.toString());

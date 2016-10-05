@@ -1,10 +1,10 @@
 package net.binaryvibrance.schematicmetablocks.jobs;
 
 import com.google.common.base.Function;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
@@ -52,7 +52,7 @@ public class JobProcessor
             {
                 if (job instanceof IWorldJob)
                 {
-                    if (((IWorldJob) job).getWorld() == worldUnloadEvent.world)
+                    if (((IWorldJob) job).getWorld() == worldUnloadEvent.getWorld())
                     {
                         jobsToRemove.add(job);
                     }
@@ -61,7 +61,7 @@ public class JobProcessor
             scheduledBackgroundJobs.removeAll(jobsToRemove);
             if (currentBackgroundJob instanceof IWorldJob)
             {
-                if (((IWorldJob) currentBackgroundJob).getWorld() == worldUnloadEvent.world)
+                if (((IWorldJob) currentBackgroundJob).getWorld() == worldUnloadEvent.getWorld())
                 {
                     currentBackgroundJob.notifyUpdatedJob();
                 }

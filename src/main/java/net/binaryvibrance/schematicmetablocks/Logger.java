@@ -16,6 +16,7 @@
 
 package net.binaryvibrance.schematicmetablocks;
 
+import net.binaryvibrance.schematicmetablocks.utility.Reference;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 
@@ -61,7 +62,7 @@ public enum Logger
     {
         if (logger == null)
         {
-            logger = LogManager.getLogger(TheMod.MOD_ID);
+            logger = LogManager.getLogger(Reference.MOD_ID);
         }
     }
 

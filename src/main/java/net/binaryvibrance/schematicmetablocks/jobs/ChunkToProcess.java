@@ -4,13 +4,14 @@ import com.google.common.base.Function;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.util.ForgeDirection;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -76,25 +77,31 @@ public class ChunkToProcess implements IJob, IWorldJob
         int worldHeight = world.getActualHeight();
         Chunk chunk = world.getChunkFromChunkCoords(_x, _z);
         int[] processed = new int[16 * 16 * worldHeight];
+
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int x1 = 0; x1 < 16; ++x1)
         {
             for (int z1 = 0; z1 < 16; ++z1)
             {
                 for (int y1 = 0; y1 < world.getActualHeight(); ++y1)
                 {
-                    final Block block = chunk.getBlock(x1, y1, z1);
-                    processed[createIndex(x1, y1, z1)] = block != Blocks.air && block != ModBlock.blockImplicitAir && block != ModBlock.blockOrigin ? -1 : 0;
+                    pos.setPos(x1, y1, z1);
+
+                    final IBlockState block = chunk.getBlockState(pos);
+                    processed[createIndex(x1, y1, z1)] = block != Blocks.AIR && block != ModBlock.blockImplicitAir && block != ModBlock.blockOrigin ? -1 : 0;
                 }
             }
         }
         Queue<Integer> blocksToProcess = new LinkedList<Integer>();
 
-        for (Object obj : chunk.chunkTileEntityMap.values())
+        for (Object obj : chunk.getTileEntityMap().values())
         {
             TileEntity entity = (TileEntity) obj;
             if (entity instanceof InteriorAirMarkerTileEntity)
             {
-                blocksToProcess.add(createIndex(entity.xCoord & 15, entity.yCoord, entity.zCoord & 15));
+                BlockPos entityPos = entity.getPos();
+
+                blocksToProcess.add(createIndex(entityPos.getX() & 15, entityPos.getY(), entityPos.getZ() & 15));
             }
         }
 
@@ -116,19 +123,18 @@ public class ChunkToProcess implements IJob, IWorldJob
             int y = decodeY(blockToProcess);
             int z = decodeZ(blockToProcess);
 
-
-            Block currentBlock = chunk.getBlock(x, y, z);
+            IBlockState currentBlock = chunk.getBlockState(x, y, z);
             if (currentBlock instanceof BlockAir)
             {
-                final SetBlock job = new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, ModBlock.blockImplicitAir, 0);
+                final SetBlock job = new SetBlock(id, world, new BlockPos(chunkXStart + x, y, chunkZStart + z), ModBlock.blockImplicitAir.getDefaultState());
                 jobProcessor.scheduleJob(JobType.WORLD_TICK, job);
             }
 
-            for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS)
+            for (EnumFacing d : EnumFacing.VALUES)
             {
-                int neighbourX = x + d.offsetX;
-                int neighbourY = y + d.offsetY;
-                int neighbourZ = z + d.offsetZ;
+                int neighbourX = x + d.getFrontOffsetX();
+                int neighbourY = y + d.getFrontOffsetY();
+                int neighbourZ = z + d.getFrontOffsetZ();
 
                 if (neighbourX >= 0 && neighbourX <= 15 && neighbourY >= 0 && neighbourY < worldHeight && neighbourZ >= 0 && neighbourZ <= 15)
                 {
@@ -156,9 +162,9 @@ public class ChunkToProcess implements IJob, IWorldJob
 
                 for (int z = 0; z < 16; ++z)
                 {
-                    if (processed[createIndex(x, y, z)] == 0 && chunk.getBlock(x, y, z) == ModBlock.blockImplicitAir)
+                    if (processed[createIndex(x, y, z)] == 0 && chunk.getBlockState(x, y, z) == ModBlock.blockImplicitAir)
                     {
-                        final SetBlock setBlock = new SetBlock(id, world, chunkXStart + x, y, chunkZStart + z, Blocks.air, 0);
+                        final SetBlock setBlock = new SetBlock(id, world, new BlockPos(chunkXStart + x, y, chunkZStart + z), Blocks.AIR.getDefaultState());
                         jobProcessor.scheduleJob(JobType.WORLD_TICK, setBlock);
                     }
                 }

@@ -1,50 +1,50 @@
 package net.binaryvibrance.schematicmetablocks.blocks;
 
-import net.binaryvibrance.schematicmetablocks.TheMod;
-import net.binaryvibrance.schematicmetablocks.proxy.ClientProxy;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class RegionBlock extends MetaBlock
+public class RegionBlock extends Block
 {
-    public static final String NAME = "blockRegion";
-    private IIcon badIcon;
+    //public static final String NAME = "blockRegion";
+    //private IIcon badIcon;
 
     public RegionBlock()
     {
-        super(Material.redstoneLight);
-        this.setBlockName(NAME);
+        super(Material.REDSTONE_LIGHT);
+        //this.setBlockName(NAME);
     }
 
-    @Override
+    /*@Override
     public void registerBlockIcons(IIconRegister iconRegister)
     {
         super.registerBlockIcons(iconRegister);
         badIcon = iconRegister.registerIcon(TheMod.MOD_ID + ":" + NAME + "-bad");
-    }
+    }*/
 
+    /*
     @Override
     public boolean renderAsNormalBlock()
     {
         return false;
     }
-
-    @Override
+*/
+    /*@Override
     public int getRenderType()
     {
         return ClientProxy.regionBlockRendererId;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
         IIcon icon;
@@ -58,36 +58,38 @@ public class RegionBlock extends MetaBlock
         }
 
         return icon;
-    }
+    }*/
 
     @Override
-    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity entity)
+    @Deprecated
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn)
     {
-        if (!(entity instanceof EntityPlayer))
+        if (!(entityIn instanceof EntityPlayer))
         {
-            super.addCollisionBoxesToList(world, x, y, z, p_149743_5_, p_149743_6_, entity);
+            super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
         }
     }
 
     @Override
-    public boolean isOpaqueCube()
+    @Deprecated
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
-    @Override
+    /*@Override
     public int getRenderBlockPass()
     {
         return 1;
-    }
+    }*/
 
     @Override
-    public void onBlockPreDestroy(World world, int x, int y, int z, int p_149725_5_)
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        final TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (tileEntity instanceof RegionTileEntity)
         {
-            RegionTileEntity regionTileEntity = (RegionTileEntity) tileEntity;
+            final RegionTileEntity regionTileEntity = (RegionTileEntity) tileEntity;
             final RegionTileEntity opposite = regionTileEntity.getLinkedTileEntity();
             if (opposite != null)
             {
@@ -97,21 +99,21 @@ public class RegionBlock extends MetaBlock
     }
 
     @Override
-    public boolean hasTileEntity(int metadata)
+    public boolean hasTileEntity(IBlockState state)
     {
         return true;
     }
 
     @Override
-    public TileEntity createTileEntity(World world, int metadata)
+    public TileEntity createTileEntity(World world, IBlockState state)
     {
         return new RegionTileEntity();
     }
 
-    @Override
+    /*@Override
     public boolean canRenderInPass(int pass)
     {
         ClientProxy.renderPass = pass;
         return pass < 2;
-    }
+    }*/
 }

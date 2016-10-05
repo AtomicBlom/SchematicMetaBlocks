@@ -16,43 +16,50 @@
 
 package net.binaryvibrance.schematicmetablocks.library;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import net.binaryvibrance.schematicmetablocks.TheMod;
-import net.binaryvibrance.schematicmetablocks.blocks.*;
-import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
-import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
+import net.binaryvibrance.schematicmetablocks.utility.Reference;
+import net.minecraft.block.Block;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @SuppressWarnings({"UtilityClass", "WeakerAccess"})
-@GameRegistry.ObjectHolder(TheMod.MOD_ID)
+@GameRegistry.ObjectHolder(Reference.MOD_ID)
 public final class ModBlock
 {
     // *******
     // * NOTE: @GameRegistry.ObjectHolder requires these fields to have the same name as the unlocalized name of the
     // *       object.
     // *
-    public static InteriorAirMarker blockInteriorAirMarker;
-    public static ImplicitAirBlock blockImplicitAir;
-    public static ExplicitAirBlock blockExplicitAir;
-    public static OriginBlock blockOrigin;
-    public static NullBlock blockNull;
-    public static RegionBlock blockRegion;
+    public static final Block blockInteriorAirMarker;
+    public static final Block blockImplicitAir;
+    public static final Block blockExplicitAir;
+    public static final Block blockOrigin;
+    public static final Block blockNull;
+    public static final Block blockRegion;
 
     private ModBlock()
     {
         throw new AssertionError();
     }
 
-    public static void registerTileEntities()
-    {
-        GameRegistry.registerTileEntity(InteriorAirMarkerTileEntity.class, getTEName(blockInteriorAirMarker.NAME));
-        GameRegistry.registerTileEntity(RegionTileEntity.class, getTEName(blockRegion.NAME));
+    static {
+        blockInteriorAirMarker = null;
+        blockImplicitAir = null;
+        blockExplicitAir = null;
+        blockOrigin = null;
+        blockNull = null;
+        blockRegion = null;
     }
 
-    private static String getTEName(String name) { return "tile." + name;}
+    public static void registerTileEntities()
+    {
+        //GameRegistry.registerTileEntity(InteriorAirMarkerTileEntity.class, getTEName(blockInteriorAirMarker.NAME));
+        //GameRegistry.registerTileEntity(RegionTileEntity.class, getTEName(blockRegion.NAME));
+    }
+
+
 
     public static void init()
     {
-        blockInteriorAirMarker = new InteriorAirMarker();
+        /*blockInteriorAirMarker = new InteriorAirMarker();
         blockImplicitAir = new ImplicitAirBlock();
         blockExplicitAir = new ExplicitAirBlock();
         blockOrigin = new OriginBlock();
@@ -64,6 +71,6 @@ public final class ModBlock
         GameRegistry.registerBlock(blockExplicitAir, blockExplicitAir.NAME);
         GameRegistry.registerBlock(blockNull, blockNull.NAME);
         GameRegistry.registerBlock(blockOrigin, blockOrigin.NAME);
-        GameRegistry.registerBlock(blockRegion, blockRegion.NAME);
+        GameRegistry.registerBlock(blockRegion, blockRegion.NAME);*/
     }
 }

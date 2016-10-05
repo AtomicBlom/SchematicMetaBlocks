@@ -1,6 +1,7 @@
 package net.binaryvibrance.schematicmetablocks.jobs;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 class SetBlock implements IJob
@@ -8,27 +9,21 @@ class SetBlock implements IJob
 
     public final int correlationId;
     private final World world;
-    private final int x;
-    private final int y;
-    private final int z;
-    private final Block block;
-    private final int metadata;
+    private final BlockPos pos;
+    private final IBlockState state;
 
-    public SetBlock(int correlationId, World world, int x, int y, int z, Block block, int metadata)
+    public SetBlock(int correlationId, World world, BlockPos pos, IBlockState blockState)
     {
         this.correlationId = correlationId;
         this.world = world;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.block = block;
-        this.metadata = metadata;
+        this.pos = pos;
+        state = blockState;
     }
 
     @Override
     public void start()
     {
-        world.setBlock(x, y, z, block, metadata, 3);
+        world.setBlockState(pos, state, 3);
     }
 
     @Override
