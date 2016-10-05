@@ -2,6 +2,7 @@ package net.binaryvibrance.schematicmetablocks.events;
 
 import com.google.common.collect.Queues;
 import net.binaryvibrance.schematicmetablocks.blocks.*;
+import net.binaryvibrance.schematicmetablocks.config.Settings;
 import net.binaryvibrance.schematicmetablocks.utility.Localization;
 import net.binaryvibrance.schematicmetablocks.utility.Reference;
 import net.minecraft.block.Block;
@@ -53,8 +54,7 @@ public class BlockRegistration
         block.setRegistryName(name)
                 .setUnlocalizedName(Localization.getUnlocalizedNameFor(block));
 
-        //FIXME: read configuration setting
-        if (true && addToCreativeTab) {
+        if (Settings.creatorMode() && addToCreativeTab) {
             block.setCreativeTab(Reference.CreativeTab);
         }
 

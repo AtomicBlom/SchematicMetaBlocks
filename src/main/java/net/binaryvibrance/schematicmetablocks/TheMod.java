@@ -1,5 +1,6 @@
 package net.binaryvibrance.schematicmetablocks;
 
+import net.binaryvibrance.schematicmetablocks.config.Settings;
 import net.binaryvibrance.schematicmetablocks.events.SchematicSaveListener;
 import net.binaryvibrance.schematicmetablocks.events.WorldListener;
 import net.binaryvibrance.schematicmetablocks.gui.GuiHandler;
@@ -32,18 +33,19 @@ public class TheMod
     public static final SimpleNetworkWrapper CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.MOD_ID);
     @Mod.Instance(Reference.MOD_ID)
     public static TheMod instance;
+
     @SidedProxy(clientSide = "net.binaryvibrance.schematicmetablocks.proxy.ClientProxy", serverSide = "net.binaryvibrance.schematicmetablocks.proxy.CommonProxy")
     public static CommonProxy proxy;
-    public static Configuration configFile;
-    public static boolean creatorMode = true;
+    //public static Configuration configFile;
+    //public static boolean creatorMode = true;
 
     @Mod.EventHandler
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
     {
         CHANNEL.registerMessage(SetSchematicNameMessageHandler.class, SetSchematicNameMessage.class, 0, Side.SERVER);
 
-        configFile = new Configuration(event.getSuggestedConfigurationFile());
-        syncConfig();
+        Settings.syncConfig(new Configuration(event.getSuggestedConfigurationFile()));
+        //syncConfig();
         //ModBlock.init();
         //ModItem.init();
     }
@@ -75,11 +77,11 @@ public class TheMod
         return true;
     }
 
-    public static void syncConfig() {
+    /*public static void syncConfig() {
         creatorMode = configFile.getBoolean("creatorMode", Configuration.CATEGORY_GENERAL, creatorMode, "Turning off Creator mode disables all the blocks and hides the creative tab");
 
         if(configFile.hasChanged())
             configFile.save();
-    }
+    }*/
 }
 

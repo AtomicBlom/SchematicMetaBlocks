@@ -20,6 +20,12 @@ public final class Reference
     public static final String MOD_NAME = "Schematic Meta-Blocks";
     public static final String MOD_VERSION = "@MOD_VERSION@";
 
+    public static final class SettingsHelp {
+        public static final String CreatorMode = "Turning off Creator mode disables all the blocks and hides the creative tab";
+
+        private SettingsHelp() {}
+    }
+
     public static final class Blocks {
         //public static final String NORMAL_VARIANT = "normal";
 
