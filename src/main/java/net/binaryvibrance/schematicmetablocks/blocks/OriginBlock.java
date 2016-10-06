@@ -12,37 +12,12 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class OriginBlock extends Block //implements IBlockWithFloor
+public class OriginBlock extends Block
 {
-    public static final String NAME = "blockOrigin";
-    //private IIcon floorIcon;
-
     public OriginBlock()
     {
         super(Material.GLASS);
-        //this.setBlockName(NAME);
     }
-
-    /*
-    @Override
-    public IIcon getFloorIcon()
-    {
-        return floorIcon;
-    }
-
-    @Override
-    public void registerBlockIcons(IIconRegister iconRegister)
-    {
-        super.registerBlockIcons(iconRegister);
-        floorIcon = iconRegister.registerIcon(TheMod.MOD_ID + ":originFloor");
-    }
-    */
-    /*@Override
-    public int getRenderType()
-    {
-        return ClientProxy.originBlockRendererId;
-    }*/
-
 
     @Override
     @Deprecated

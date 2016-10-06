@@ -24,14 +24,7 @@ import java.util.List;
 
 public class MetaToolItem extends Item
 {
-    /*public static final String NAME = "metaTool";
-
-    public MetaToolItem()
-    {
-        setUnlocalizedName(NAME);
-    }*/
-
-    private NBTTagCompound getTagCompoundSafe(ItemStack stack)
+    private static NBTTagCompound getTagCompoundSafe(ItemStack stack)
     {
         NBTTagCompound nbt = stack.getTagCompound();
         if (nbt == null)
@@ -42,16 +35,16 @@ public class MetaToolItem extends Item
         return nbt;
     }
 
-    private MetaToolMode getMetaToolMode(ItemStack stack)
+    private static MetaToolMode getMetaToolMode(ItemStack stack)
     {
-        NBTTagCompound nbt = getTagCompoundSafe(stack);
+        final NBTTagCompound nbt = getTagCompoundSafe(stack);
         final MetaToolMode[] modes = MetaToolMode.values();
         return modes[nbt.getInteger("Mode") % modes.length];
     }
 
-    private void setMetaToolMode(ItemStack stack, MetaToolMode mode)
+    private static void setMetaToolMode(ItemStack stack, MetaToolMode mode)
     {
-        NBTTagCompound nbt = getTagCompoundSafe(stack);
+        final NBTTagCompound nbt = getTagCompoundSafe(stack);
 
         nbt.setInteger("Mode", mode.ordinal());
     }
@@ -61,10 +54,10 @@ public class MetaToolItem extends Item
     {
         if (playerIn.isSneaking()) return EnumActionResult.PASS;
 
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        final TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (tileEntity instanceof RegionTileEntity)
         {
-            MetaToolMode mode = getMetaToolMode(stack);
+            final MetaToolMode mode = getMetaToolMode(stack);
             final RegionTileEntity regionTileEntity = (RegionTileEntity) tileEntity;
 
             boolean result = false;
@@ -102,7 +95,12 @@ public class MetaToolItem extends Item
     @Override
     public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand)
     {
-        if (!worldIn.isRemote && playerIn.isSneaking())
+        if (worldIn.isRemote)
+        {
+            return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
+        }
+
+        if (playerIn.isSneaking())
         {
             MetaToolMode mode = getMetaToolMode(itemStackIn);
 
@@ -112,18 +110,23 @@ public class MetaToolItem extends Item
             final String displayName = getItemStackDisplayName(itemStackIn);
             itemStackIn.setStackDisplayName(displayName);
             playerIn.addChatComponentMessage(new TextComponentString("MetaTool mode changed: " + displayName));
+        } else {
+            if (getMetaToolMode(itemStackIn) == MetaToolMode.CLEAR_METATOOL) {
+                clearMetaTool(itemStackIn, playerIn);
+            }
         }
+
         return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
     }
 
     @Override
-    public void addInformation(ItemStack itemStack, EntityPlayer p_77624_2_, List list, boolean p_77624_4_)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
-        final NBTTagCompound coords = itemStack.getTagCompound();
+        final NBTTagCompound coords = stack.getTagCompound();
         if (coords != null)
         {
             final BlockPos worldBlockCoord = NBTUtils.readBlockPos(coords);
-            list.add(String.format("(%d, %d, %d)", worldBlockCoord.getX(), worldBlockCoord.getY(), worldBlockCoord.getZ()));
+            tooltip.add(String.format("(%d, %d, %d)", worldBlockCoord.getX(), worldBlockCoord.getY(), worldBlockCoord.getZ()));
         }
     }
 
@@ -147,13 +150,13 @@ public class MetaToolItem extends Item
             }
         }
 
-        String name = I18n.translateToLocal(
+        final String name = I18n.translateToLocal(
                 String.format("%s.%s.name", this.getUnlocalizedNameInefficiently(stack), modeName)
         ) + extra;
         return name;
     }
 
-    private boolean saveSchematic(World world, EntityPlayer player, RegionTileEntity regionTileEntity)
+    private static boolean saveSchematic(World world, EntityPlayer player, RegionTileEntity regionTileEntity)
     {
         if (world.isRemote)
         {
@@ -174,13 +177,13 @@ public class MetaToolItem extends Item
             final BlockPos location = regionTileEntity.getPos();
             final BlockPos oppositeLocation = regionTileEntity.getLinkedLocation();
 
-            int minX = Math.min(location.getX(), oppositeLocation.getX()) + 1;
-            int minY = Math.min(location.getY(), oppositeLocation.getY()) + 1;
-            int minZ = Math.min(location.getZ(), oppositeLocation.getZ()) + 1;
+            final int minX = Math.min(location.getX(), oppositeLocation.getX()) + 1;
+            final int minY = Math.min(location.getY(), oppositeLocation.getY()) + 1;
+            final int minZ = Math.min(location.getZ(), oppositeLocation.getZ()) + 1;
 
-            int maxX = Math.max(location.getX(), oppositeLocation.getX()) - 1;
-            int maxY = Math.max(location.getY(), oppositeLocation.getY()) - 1;
-            int maxZ = Math.max(location.getZ(), oppositeLocation.getZ()) - 1;
+            final int maxX = Math.max(location.getX(), oppositeLocation.getX()) - 1;
+            final int maxY = Math.max(location.getY(), oppositeLocation.getY()) - 1;
+            final int maxZ = Math.max(location.getZ(), oppositeLocation.getZ()) - 1;
 
             Minecraft.getMinecraft().thePlayer.sendChatMessage(
                     String.format("/schematicaSave %d %d %d %d %d %d %s",
@@ -193,7 +196,7 @@ public class MetaToolItem extends Item
         return true;
     }
 
-    private boolean setName(World world, EntityPlayer player, RegionTileEntity tileEntity)
+    private static boolean setName(World world, EntityPlayer player, RegionTileEntity tileEntity)
     {
         if (world.isRemote)
         {
@@ -204,7 +207,7 @@ public class MetaToolItem extends Item
         return false;
     }
 
-    private boolean clearMetaTool(ItemStack stack, EntityPlayer player)
+    private static boolean clearMetaTool(ItemStack stack, EntityPlayer player)
     {
 
         final NBTTagCompound nbt = getTagCompoundSafe(stack);
@@ -213,7 +216,7 @@ public class MetaToolItem extends Item
         return true;
     }
 
-    private boolean clearRegion(RegionTileEntity selectedTileEntity)
+    private static boolean clearRegion(RegionTileEntity selectedTileEntity)
     {
         if (!selectedTileEntity.isPaired())
         {
@@ -227,14 +230,14 @@ public class MetaToolItem extends Item
         return true;
     }
 
-    private boolean moveRegion(World world, BlockPos worldBlockCoord, EnumFacing direction, RegionTileEntity originalTileEntity, boolean push)
+    private static boolean moveRegion(World world, BlockPos worldBlockCoord, EnumFacing direction, RegionTileEntity originalTileEntity, boolean push)
     {
         if (push)
         {
             direction = direction.getOpposite();
         }
 
-        BlockPos newPos = worldBlockCoord.offset(direction);
+        final BlockPos newPos = worldBlockCoord.offset(direction);
 
         if (!world.isAirBlock(newPos))
         {
@@ -273,7 +276,7 @@ public class MetaToolItem extends Item
             return false;
         }
 
-        NBTTagCompound nbt = getTagCompoundSafe(stack);
+        final NBTTagCompound nbt = getTagCompoundSafe(stack);
 
         if (!nbt.hasKey("Link"))
         {
@@ -294,14 +297,14 @@ public class MetaToolItem extends Item
 
             Logger.info("Applying MetaTool Coordinates - %s", oppositeWorldCoords);
 
-            TileEntity tileEntity = world.getTileEntity(oppositeWorldCoords);
+            final TileEntity tileEntity = world.getTileEntity(oppositeWorldCoords);
             if (!(tileEntity instanceof RegionTileEntity))
             {
                 player.addChatComponentMessage(new TextComponentString("Linked Region Block no longer exists."));
                 clearMetaTool(stack, player);
                 return false;
             }
-            RegionTileEntity oppositeRegion = (RegionTileEntity) tileEntity;
+            final RegionTileEntity oppositeRegion = (RegionTileEntity) tileEntity;
 
             selectedRegion.setLinkedTileEntityWithReverify(oppositeRegion);
             oppositeRegion.setLinkedTileEntityWithReverify(selectedRegion);

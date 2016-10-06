@@ -16,50 +16,10 @@ import java.util.List;
 
 public class RegionBlock extends Block
 {
-    //public static final String NAME = "blockRegion";
-    //private IIcon badIcon;
-
     public RegionBlock()
     {
         super(Material.REDSTONE_LIGHT);
-        //this.setBlockName(NAME);
     }
-
-    /*@Override
-    public void registerBlockIcons(IIconRegister iconRegister)
-    {
-        super.registerBlockIcons(iconRegister);
-        badIcon = iconRegister.registerIcon(TheMod.MOD_ID + ":" + NAME + "-bad");
-    }*/
-
-    /*
-    @Override
-    public boolean renderAsNormalBlock()
-    {
-        return false;
-    }
-*/
-    /*@Override
-    public int getRenderType()
-    {
-        return ClientProxy.regionBlockRendererId;
-    }*/
-
-    /*@Override
-    public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side)
-    {
-        IIcon icon;
-        RegionTileEntity tileEntity = RegionTileEntity.tryGetTileEntity(blockAccess, x, y, z);
-        if (!tileEntity.isPaired())
-        {
-            icon = badIcon;
-        } else
-        {
-            icon = blockIcon;
-        }
-
-        return icon;
-    }*/
 
     @Override
     @Deprecated
@@ -77,12 +37,6 @@ public class RegionBlock extends Block
     {
         return false;
     }
-
-    /*@Override
-    public int getRenderBlockPass()
-    {
-        return 1;
-    }*/
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
@@ -110,13 +64,6 @@ public class RegionBlock extends Block
     {
         return new RegionTileEntity();
     }
-
-    /*@Override
-    public boolean canRenderInPass(int pass)
-    {
-        ClientProxy.renderPass = pass;
-        return pass < 2;
-    }*/
 
     @Override
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer)

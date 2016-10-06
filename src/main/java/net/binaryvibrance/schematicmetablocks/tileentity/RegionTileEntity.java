@@ -5,12 +5,14 @@ import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
 import net.binaryvibrance.schematicmetablocks.jobs.JobType;
 import net.binaryvibrance.schematicmetablocks.jobs.VerifyOpposingRegionBlockJob;
+import net.binaryvibrance.schematicmetablocks.utility.NBTUtils;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import javax.annotation.Nullable;
 
 public class RegionTileEntity extends TileEntity
 {
@@ -31,10 +33,10 @@ public class RegionTileEntity extends TileEntity
 
     public void setLinkedTileEntityWithReverify(RegionTileEntity newOpposite)
     {
-        Logger.info("Setting Region Opposite: %s", this);
         RegionTileEntity currentOpposite = getLinkedTileEntity();
 
         this.oppositeLocation = newOpposite == null ? null : newOpposite.getPos();
+        Logger.info("Setting Region Opposite: %s", this);
         if (currentOpposite != null)
         {
             Logger.info("Scheduling job to clear opposite %s", currentOpposite);
@@ -58,8 +60,8 @@ public class RegionTileEntity extends TileEntity
 
     public void setLinkedTileEntity(RegionTileEntity newOpposite)
     {
-        Logger.info("Setting Region Opposite: %s", this);
         this.oppositeLocation = newOpposite == null ? null : newOpposite.getPos();
+        Logger.info("Setting Region Opposite: %s", this);
         if (worldObj != null && worldObj.isRemote)
         {
             sendUpdate();
@@ -71,7 +73,10 @@ public class RegionTileEntity extends TileEntity
     {
         super.readFromNBT(nbt);
         final NBTTagCompound opposite = nbt.getCompoundTag("Opposite");
-        this.oppositeLocation = new BlockPos(opposite.getInteger("x"), opposite.getInteger("y"), opposite.getInteger("z"));
+        if (opposite != null)
+        {
+            this.oppositeLocation = NBTUtils.readBlockPos(opposite);
+        }
 
         this.schematicName = nbt.hasKey("SchematicName") ? nbt.getString("SchematicName") : null;
         Logger.info("Reading from NBT: %s", this);
@@ -92,12 +97,7 @@ public class RegionTileEntity extends TileEntity
         Logger.info("writing to NBT: %s", this);
         if (oppositeLocation != null)
         {
-            NBTTagCompound compound = new NBTTagCompound();
-            compound.setInteger("x", this.pos.getX());
-            compound.setInteger("y", this.pos.getY());
-            compound.setInteger("z", this.pos.getZ());
-
-            nbt.setTag("Opposite", compound);
+            nbt.setTag("Opposite", NBTUtils.writeBlockPos(oppositeLocation));
         }
         if (schematicName != null)
         {
@@ -106,13 +106,14 @@ public class RegionTileEntity extends TileEntity
         return nbt;
     }
 
-    /*@Override
-    public Packet getDescriptionPacket()
+    @Nullable
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket()
     {
         final NBTTagCompound nbt = new NBTTagCompound();
         writeToNBT(nbt);
         return new SPacketUpdateTileEntity(getPos(), 1, nbt);
-    }*/
+    }
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet)

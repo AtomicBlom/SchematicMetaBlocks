@@ -56,22 +56,18 @@ public class ChunkToProcess implements IJob, IWorldJob
         final JobProcessor jobProcessor = JobProcessor.Instance;
 
         final int id = idGenerator.incrementAndGet();
-        final Function<IJob, Boolean> jobIsCorrelated = new Function<IJob, Boolean>()
+        final Function<IJob, Boolean> jobIsCorrelated = iJob ->
         {
-            @Override
-            public Boolean apply(IJob iJob)
+            if (iJob instanceof SetBlock)
             {
-                if (iJob instanceof SetBlock)
+                SetBlock job = (SetBlock) iJob;
+                if (job.correlationId == id)
                 {
-                    SetBlock job = (SetBlock) iJob;
-                    if (job.correlationId == id)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
-
-                return false;
             }
+
+            return false;
         };
 
         int worldHeight = world.getActualHeight();
@@ -92,7 +88,7 @@ public class ChunkToProcess implements IJob, IWorldJob
                 }
             }
         }
-        Queue<Integer> blocksToProcess = new LinkedList<Integer>();
+        Queue<Integer> blocksToProcess = new LinkedList<>();
 
         for (Object obj : chunk.getTileEntityMap().values())
         {

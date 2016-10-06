@@ -22,14 +22,7 @@ public class JobProcessor
 
     private JobProcessor()
     {
-        _thread = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                ProcessBackgroundJobs();
-            }
-        });
+        _thread = new Thread(this::ProcessBackgroundJobs);
         _thread.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread()
@@ -47,7 +40,7 @@ public class JobProcessor
     {
         synchronized (jobContextSwitchLock)
         {
-            LinkedList<IJob> jobsToRemove = new LinkedList<IJob>();
+            LinkedList<IJob> jobsToRemove = new LinkedList<>();
             for (IJob job : scheduledBackgroundJobs)
             {
                 if (job instanceof IWorldJob)
@@ -125,12 +118,6 @@ public class JobProcessor
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent tickEvent)
     {
-        /*for (IJob job : unscheduledBackgroundJobs)
-        {
-            scheduleBackgroundJob(job);
-        }
-        unscheduledBackgroundJobs.clear();*/
-
         int jobQuota = 32;
         while (!scheduledTickJobs.isEmpty() && --jobQuota > 0)
         {
@@ -138,11 +125,6 @@ public class JobProcessor
             job.start();
         }
     }
-
-    /*public void scheduleWorldTickJob(IJob job)
-    {
-        scheduledTickJobs.add(job);
-    }*/
 
     public void scheduleJob(JobType jobType, IJob job)
     {
@@ -188,7 +170,6 @@ public class JobProcessor
         {
             jobs.remove(job);
         }
-
     }
 }
 

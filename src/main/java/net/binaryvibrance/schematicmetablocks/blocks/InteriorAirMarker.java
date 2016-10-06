@@ -19,22 +19,12 @@ import net.minecraft.world.World;
 
 public class InteriorAirMarker extends Block
 {
-    //public static final String NAME = "blockInteriorAirMarker";
-
     private static final AxisAlignedBB bounds = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 0.15F, 1.0F);
 
     public InteriorAirMarker()
     {
         super(Material.GLASS);
-        //this.setBlockName(NAME);
     }
-
-
-    /*@Override
-    public boolean renderAsNormalBlock()
-    {
-        return false;
-    }*/
 
     @Override
     @Deprecated
@@ -42,25 +32,6 @@ public class InteriorAirMarker extends Block
     {
         return bounds;
     }
-
-    /*@Override
-    public int getRenderType()
-    {
-        return ClientProxy.insideMetadataBlockRendererId;
-    }*/
-
-    /*@Override
-    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
-    {
-        ForgeDirection direction = ForgeDirection.getOrientation(side);
-        Block b = world.getBlock(x + direction.offsetX, y + direction.offsetY, z + direction.offsetZ);
-        if (b instanceof ImplicitAirBlock || b instanceof InteriorAirMarker)
-        {
-            return null;
-        }
-
-        return super.getIcon(world, x, y, z, side);
-    }*/
 
     @Override
     @Deprecated
@@ -74,12 +45,6 @@ public class InteriorAirMarker extends Block
     {
         worldIn.setBlockState(pos, ModBlock.blockImplicitAir.getDefaultState(), 3);
     }
-
-    /*@Override
-    public int getRenderBlockPass()
-    {
-        return 1;
-    }*/
 
     @Override
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
@@ -103,14 +68,6 @@ public class InteriorAirMarker extends Block
     {
         return new InteriorAirMarkerTileEntity();
     }
-
-    /*@Override
-    public boolean canRenderInPass(int pass)
-    {
-        ClientProxy.renderPass = pass;
-        return pass != 0;
-    }*/
-
 
     @Override
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer)

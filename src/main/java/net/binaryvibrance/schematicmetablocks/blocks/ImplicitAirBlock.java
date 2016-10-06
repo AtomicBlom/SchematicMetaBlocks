@@ -6,6 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -15,38 +16,22 @@ import java.util.List;
 
 public class ImplicitAirBlock extends Block
 {
-    //public static final String NAME = "blockImplicitAir";
-
     public ImplicitAirBlock()
     {
-        super(Material.GLASS);
-        //this.setBlockName(NAME);
-    }
-
-    /*@Override
-    public boolean renderAsNormalBlock()
-    {
-        return false;
-    }*/
-
-    /*@Override
-    public int getRenderType()
-    {
-        return ClientProxy.insideMetadataBlockRendererId;
+        super(Material.AIR);
     }
 
     @Override
-    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
+    @Deprecated
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
     {
-        ForgeDirection direction = ForgeDirection.getOrientation(side);
-        Block b = world.getBlock(x + direction.offsetX, y + direction.offsetY, z + direction.offsetZ);
-        if (b instanceof ImplicitAirBlock || b instanceof InteriorAirMarker)
+        IBlockState b = blockAccess.getBlockState(pos.offset(side));
+        if (b.getBlock() instanceof ImplicitAirBlock)
         {
-            return null;
+            return false;
         }
-
-        return super.getIcon(world, x, y, z, side);
-    }*/
+        return true;
+    }
 
     @Override
     @Deprecated
@@ -79,25 +64,11 @@ public class ImplicitAirBlock extends Block
         return false;
     }
 
-    /*@Override
-    public int getRenderBlockPass()
-    {
-        return 1;
-    }
-    */
-
     @Override
     public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos)
     {
         return true;
     }
-
-    /*@Override
-    public boolean canRenderInPass(int pass)
-    {
-        ClientProxy.renderPass = pass;
-        return pass != 0;
-    }*/
 
     @Override
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer)

@@ -2,6 +2,7 @@ package net.binaryvibrance.schematicmetablocks.events;
 
 import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.config.Settings;
+import net.binaryvibrance.schematicmetablocks.render.RegionTESR;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.binaryvibrance.schematicmetablocks.utility.Localization;
@@ -11,10 +12,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber
 public class BlockRegistration
@@ -24,7 +28,7 @@ public class BlockRegistration
         final IForgeRegistry<Block> registry = event.getRegistry();
 
         registerBlockAndItem(registry, new ExplicitAirBlock(), Reference.Blocks.ExplicitAir);
-        registerBlockAndItem(registry, new ImplicitAirBlock(), Reference.Blocks.ImplicitAir, false);
+        registerBlockAndItem(registry, new ImplicitAirBlock(), Reference.Blocks.ImplicitAir);
         registerBlockAndItem(registry, new InteriorAirMarker(), Reference.Blocks.InteriorAirMarker);
         registerBlockAndItem(registry, new NullBlock(), Reference.Blocks.Null, false);
         registerBlockAndItem(registry, new OriginBlock(), Reference.Blocks.Origin);
@@ -73,5 +77,11 @@ public class BlockRegistration
         }
 
         return itemBlock;
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public static void registerRendering(RegisterRendering event) {
+        ClientRegistry.bindTileEntitySpecialRenderer(RegionTileEntity.class, new RegionTESR());
     }
 }

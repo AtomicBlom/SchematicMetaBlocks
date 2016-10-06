@@ -21,6 +21,10 @@ public final class NBTUtils
     }
 
     public static BlockPos readBlockPos(NBTTagCompound compound) {
+        if (!compound.hasKey("x") || !compound.hasKey("y") || !compound.hasKey("z") ) {
+            return null;
+        }
+
         return new BlockPos(
                 compound.getInteger("x"),
                 compound.getInteger("y"),

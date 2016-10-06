@@ -1,8 +1,8 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "textures": { "all": "schematicmetablocks:blocks/blockImplicitAir" },
-    "model": "cube_all",
+    "textures": { "side": "schematicmetablocks:blocks/blockImplicitAir" },
+    "model": "schematicmetablocks:implicitAir",
     "transform": "forge:default-block"
   },
   "variants": {

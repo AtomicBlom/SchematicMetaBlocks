@@ -18,7 +18,7 @@ public class ExplicitAirBlock extends Block
 {
     public ExplicitAirBlock()
     {
-        super(Material.GLASS);
+        super(Material.AIR);
     }
 
     @Override
