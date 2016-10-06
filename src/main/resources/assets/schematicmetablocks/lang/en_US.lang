@@ -6,12 +6,12 @@ tile.schematicmetablocks:blockRegion.name=Region Marker
 # Creative Tabs
 itemGroup.schematicmetablocks=Schematic Meta-Blocks
 # Items
-item.schematicmetablocks:metaTool.name=Meta Tool
-item.schematicmetablocks:metaTool.clear_metatool.name=Meta Tool (Clear Meta Tool)
-item.schematicmetablocks:metaTool.set_name.name=Meta Tool (Set Schematic Name)
-item.schematicmetablocks:metaTool.save_schematic.name=Meta Tool (Save Schematic)
-item.schematicmetablocks:metaTool.push.name=Meta Tool (Push Region Block)
-item.schematicmetablocks:metaTool.pull.name=Meta Tool (Pull Region Block)
-item.schematicmetablocks:metaTool.set_region_unset.name=Meta Tool (Link Region Block - None Set)
-item.schematicmetablocks:metaTool.set_region.name=Meta Tool (Link Region Block)
-item.schematicmetablocks:metaTool.clear_region.name=Meta Tool (Unlink Region Block)
+item.schematicmetablocks:itemMetaTool.name=Meta Tool
+item.schematicmetablocks:itemMetaTool.clear_metatool.name=Meta Tool (Clear Meta Tool)
+item.schematicmetablocks:itemMetaTool.set_name.name=Meta Tool (Set Schematic Name)
+item.schematicmetablocks:itemMetaTool.save_schematic.name=Meta Tool (Save Schematic)
+item.schematicmetablocks:itemMetaTool.push.name=Meta Tool (Push Region Block)
+item.schematicmetablocks:itemMetaTool.pull.name=Meta Tool (Pull Region Block)
+item.schematicmetablocks:itemMetaTool.set_region_unset.name=Meta Tool (Link Region Block - None Set)
+item.schematicmetablocks:itemMetaTool.set_region.name=Meta Tool (Link Region Block)
+item.schematicmetablocks:itemMetaTool.clear_region.name=Meta Tool (Unlink Region Block)
