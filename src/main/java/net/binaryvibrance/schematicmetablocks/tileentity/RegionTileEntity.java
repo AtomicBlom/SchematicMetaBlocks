@@ -6,6 +6,7 @@ import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
 import net.binaryvibrance.schematicmetablocks.jobs.JobType;
 import net.binaryvibrance.schematicmetablocks.jobs.VerifyOpposingRegionBlockJob;
 import net.binaryvibrance.schematicmetablocks.utility.NBTUtils;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -116,6 +117,15 @@ public class RegionTileEntity extends TileEntity
     }
 
     @Override
+    public NBTTagCompound getUpdateTag() {
+        // getUpdateTag() is called whenever the chunkdata is sent to the
+        // client. In contrast getUpdatePacket() is called when the tile entity
+        // itself wants to sync to the client. In many cases you want to send
+        // over the same information in getUpdateTag() as in getUpdatePacket().
+        return writeToNBT(new NBTTagCompound());
+    }
+
+    @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet)
     {
         readFromNBT(packet.getNbtCompound());
@@ -132,6 +142,7 @@ public class RegionTileEntity extends TileEntity
 
         //Just doing' it the deterministic way. Doesn't really matter at this point as long as it doesn't flicker.
         if (thisDistance < otherDistance) return true;
+        if (thisDistance > otherDistance) return false;
         if (Math.abs(thisPos.getX()) < Math.abs(otherPos.getX())) return true;
         if (Math.abs(thisPos.getZ()) < Math.abs(otherPos.getZ())) return true;
         if (Math.abs(thisPos.getY()) < Math.abs(otherPos.getY())) return true;
@@ -143,8 +154,14 @@ public class RegionTileEntity extends TileEntity
         markDirty();
         worldObj.notifyBlockOfStateChange(pos, getBlockType());
         worldObj.addBlockEvent(pos, getBlockType(), 1, isPaired() ? 1 : 0);
+
         //FIXME: Is this needed?
         //worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+
+        if (worldObj != null) {
+            IBlockState state = worldObj.getBlockState(getPos());
+            worldObj.notifyBlockUpdate(getPos(), state, state, 3);
+        }
     }
 
     @Override

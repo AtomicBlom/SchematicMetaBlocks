@@ -1,6 +1,8 @@
 package net.binaryvibrance.schematicmetablocks.render;
 
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -18,16 +20,23 @@ public class RegionTESR extends TileEntitySpecialRenderer<RegionTileEntity>
     @Override
     public void renderTileEntityAt(RegionTileEntity te, double x, double y, double z, float partialTicks, int destroyStage)
     {
-        Tessellator temp = Tessellator.getInstance();
-        VertexBuffer tessellator = temp.getBuffer();
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer vertexBuffer = tessellator.getBuffer();
 
         final double e = 1 / 16;
         final RegionTileEntity primary = te;
         if (primary.isRenderBlock())
         {
-            BlockPos blockpos = te.getPos();
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(x, y, z);
 
-            tessellator.setTranslation(x - blockpos.getX(), y - blockpos.getY(), z - blockpos.getZ());
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.blendFunc(770, 771);
+            GlStateManager.enableBlend();
+            GlStateManager.disableCull();
+
+            //vertexBuffer.setTranslation(x - te.getPos().getX(), y - te.getPos().getY(), z - te.getPos().getZ());
+
             final RegionTileEntity opposite = primary.getLinkedTileEntity();
 
             final BlockPos primaryLocation = primary.getPos();
@@ -40,67 +49,78 @@ public class RegionTESR extends TileEntitySpecialRenderer<RegionTileEntity>
             int maxZ = Math.max(primaryLocation.getZ(), oppositeLocation.getZ());
             AxisAlignedBB boundingBox = new AxisAlignedBB(minX + 1, minY + 1, minZ + 1, maxX, maxY, maxZ).expand(e, e, e);
 
-            //tessellator.draw();
+
+            vertexBuffer.setTranslation(primaryLocation.getX(), primaryLocation.getY(), primaryLocation.getZ());
+
+            //final VertexFormat originalVertexFormat = vertexBuffer.getVertexFormat();
+            //final int originalDrawMode = vertexBuffer.getDrawMode();
+
+            //vertexBuffer.draw();
             GL11.glLineWidth(3);
-            tessellator.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
-            //tessellator.startDrawing(GL11.GL_LINE_LOOP);
-            //tessellator.setColorOpaque(255, 0, 0);
+            vertexBuffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
+            //vertexBuffer.startDrawing(GL11.GL_LINE_LOOP);
+            //vertexBuffer.setColorOpaque(255, 0, 0);
+            //vertexBuffer.noColor();
 
-            tessellator.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
-            //tessellator.addVertex(boundingBox.minX, boundingBox.minY, boundingBox.minZ);
-            //tessellator.addVertex(boundingBox.maxX, boundingBox.minY, boundingBox.minZ);
-            //tessellator.addVertex(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ);
-            //tessellator.addVertex(boundingBox.minX, boundingBox.minY, boundingBox.maxZ);
+            vertexBuffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
+            //vertexBuffer.addVertex(boundingBox.minX, boundingBox.minY, boundingBox.minZ);
+            //vertexBuffer.addVertex(boundingBox.maxX, boundingBox.minY, boundingBox.minZ);
+            //vertexBuffer.addVertex(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ);
+            //vertexBuffer.addVertex(boundingBox.minX, boundingBox.minY, boundingBox.maxZ);
 
-            tessellator.finishDrawing();
-            //tessellator.draw();
+            vertexBuffer.finishDrawing();
+            //vertexBuffer.draw();
 
-            tessellator.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
-            //tessellator.startDrawing(GL11.GL_LINE_LOOP);
-            //tessellator.setColorOpaque(255, 0, 0);
+            vertexBuffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
+            //vertexBuffer.startDrawing(GL11.GL_LINE_LOOP);
+            //vertexBuffer.setColorOpaque(255, 0, 0);
 
-            tessellator.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
-            //tessellator.addVertex(boundingBox.minX, boundingBox.maxY, boundingBox.minZ);
-            //tessellator.addVertex(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ);
-            //tessellator.addVertex(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
-            //tessellator.addVertex(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ);
+            vertexBuffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
+            //vertexBuffer.addVertex(boundingBox.minX, boundingBox.maxY, boundingBox.minZ);
+            //vertexBuffer.addVertex(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ);
+            //vertexBuffer.addVertex(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
+            //vertexBuffer.addVertex(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ);
 
-            tessellator.finishDrawing();
-            //tessellator.draw();
+            vertexBuffer.finishDrawing();
+            //vertexBuffer.draw();
 
-            tessellator.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
-            //tessellator.startDrawing(GL11.GL_LINES);
-            //tessellator.setColorOpaque(255, 0, 0);
+            vertexBuffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
+            //vertexBuffer.startDrawing(GL11.GL_LINES);
+            //vertexBuffer.setColorOpaque(255, 0, 0);
 
-            tessellator.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
-            tessellator.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
+            vertexBuffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).color(255, 0, 0, 128).endVertex();
 
-            //tessellator.addVertex(boundingBox.minX, boundingBox.minY, boundingBox.minZ);
-            //tessellator.addVertex(boundingBox.minX, boundingBox.maxY, boundingBox.minZ);
-            //tessellator.addVertex(boundingBox.maxX, boundingBox.minY, boundingBox.minZ);
-            //tessellator.addVertex(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ);
-            //tessellator.addVertex(boundingBox.minX, boundingBox.minY, boundingBox.maxZ);
-            //tessellator.addVertex(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ);
-            //tessellator.addVertex(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ);
-            //tessellator.addVertex(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
+            //vertexBuffer.addVertex(boundingBox.minX, boundingBox.minY, boundingBox.minZ);
+            //vertexBuffer.addVertex(boundingBox.minX, boundingBox.maxY, boundingBox.minZ);
+            //vertexBuffer.addVertex(boundingBox.maxX, boundingBox.minY, boundingBox.minZ);
+            //vertexBuffer.addVertex(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ);
+            //vertexBuffer.addVertex(boundingBox.minX, boundingBox.minY, boundingBox.maxZ);
+            //vertexBuffer.addVertex(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ);
+            //vertexBuffer.addVertex(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ);
+            //vertexBuffer.addVertex(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
 
-            tessellator.finishDrawing();
-            //tessellator.draw();
+            vertexBuffer.finishDrawing();
+            //vertexBuffer.draw();
 
+            vertexBuffer.setTranslation(0, 0, 0);
             GL11.glLineWidth(1);
-            //tessellator.startDrawingQuads();
+            //vertexBuffer.begin(originalDrawMode, originalVertexFormat);
+
+            RenderHelper.enableStandardItemLighting();
+            GlStateManager.popMatrix();
         }
     }
 }
