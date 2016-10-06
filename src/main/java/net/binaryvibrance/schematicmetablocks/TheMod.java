@@ -1,8 +1,7 @@
 package net.binaryvibrance.schematicmetablocks;
 
 import net.binaryvibrance.schematicmetablocks.config.Settings;
-import net.binaryvibrance.schematicmetablocks.events.SchematicSaveListener;
-import net.binaryvibrance.schematicmetablocks.events.WorldListener;
+import net.binaryvibrance.schematicmetablocks.events.*;
 import net.binaryvibrance.schematicmetablocks.gui.GuiHandler;
 import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
@@ -48,6 +47,10 @@ public class TheMod
         //syncConfig();
         //ModBlock.init();
         //ModItem.init();
+
+        //BlockRegistration.onBlockRegister(null);
+        //ItemRegistration.onItemRegistration(null);
+        MinecraftForge.EVENT_BUS.post(new RegisterRendering());
     }
 
     @SuppressWarnings("UnusedParameters")

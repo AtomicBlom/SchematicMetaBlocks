@@ -35,10 +35,7 @@ public final class ModBlock
     public static final Block blockNull;
     public static final Block blockRegion;
 
-    private ModBlock()
-    {
-        throw new AssertionError();
-    }
+    private ModBlock() { }
 
     static {
         blockInteriorAirMarker = null;

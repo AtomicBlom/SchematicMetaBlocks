@@ -1,0 +1,14 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "all": "schematicmetablocks:blocks/blockInteriorAirMarker"
+    },
+    "model": "schematicmetablocks:interiorAirMarker.generated",
+    "transform": "forge:default-block"
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}
