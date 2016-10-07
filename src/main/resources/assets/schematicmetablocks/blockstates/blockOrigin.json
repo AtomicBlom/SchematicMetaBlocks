@@ -1,12 +1,17 @@
 {
 	"forge_marker": 1,
 	"defaults": {
-		"textures": { "all": "schematicmetablocks:blocks/blockOrigin" },
-		"model": "cube_all",
+		"textures": {
+			"all": "schematicmetablocks:blocks/blockOrigin",
+			"floor": "schematicmetablocks:blocks/originFloor"
+		},
+		"model": "schematicmetablocks:originmarker",
 		"transform": "forge:default-block"
 	},
 	"variants": {
 		"normal": [{}],
-		"inventory": [{}]
+		"inventory": [{
+			"model": "cube_all"
+		}]
 	}
 }

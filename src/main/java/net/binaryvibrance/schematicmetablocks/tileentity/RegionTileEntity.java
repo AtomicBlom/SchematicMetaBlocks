@@ -2,6 +2,7 @@ package net.binaryvibrance.schematicmetablocks.tileentity;
 
 import com.google.common.base.Objects;
 import net.binaryvibrance.schematicmetablocks.Logger;
+import net.binaryvibrance.schematicmetablocks.events.TileEntityEvent;
 import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;
 import net.binaryvibrance.schematicmetablocks.jobs.JobType;
 import net.binaryvibrance.schematicmetablocks.jobs.VerifyOpposingRegionBlockJob;
@@ -13,6 +14,8 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import javax.annotation.Nullable;
 
 public class RegionTileEntity extends TileEntity
@@ -194,5 +197,12 @@ public class RegionTileEntity extends TileEntity
     {
         this.schematicName = schematicName;
         sendUpdate();
+    }
+
+    @Override
+    public void setWorldObj(World worldIn)
+    {
+        super.setWorldObj(worldIn);
+        MinecraftForge.EVENT_BUS.post(new TileEntityEvent.Added(this));
     }
 }

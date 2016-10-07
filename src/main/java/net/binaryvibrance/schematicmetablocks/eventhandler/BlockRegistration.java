@@ -30,7 +30,7 @@ public class BlockRegistration
         final IForgeRegistry<Block> registry = event.getRegistry();
 
         registerBlockAndItem(registry, new ExplicitAirBlock(), Reference.Blocks.ExplicitAir);
-        registerBlockAndItem(registry, new ImplicitAirBlock(), Reference.Blocks.ImplicitAir);
+        registerBlockAndItem(registry, new ImplicitAirBlock(), Reference.Blocks.ImplicitAir, false);
         registerBlockAndItem(registry, new InteriorAirMarker(), Reference.Blocks.InteriorAirMarker);
         registerBlockAndItem(registry, new NullBlock(), Reference.Blocks.Null, false);
         registerBlockAndItem(registry, new OriginBlock(), Reference.Blocks.Origin);

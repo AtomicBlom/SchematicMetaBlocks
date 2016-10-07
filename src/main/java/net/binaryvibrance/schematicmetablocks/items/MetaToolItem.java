@@ -2,6 +2,8 @@ package net.binaryvibrance.schematicmetablocks.items;
 
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.binaryvibrance.schematicmetablocks.TheMod;
+import net.binaryvibrance.schematicmetablocks.events.RegisterRenderingEvent;
+import net.binaryvibrance.schematicmetablocks.events.TileEntityEvent;
 import net.binaryvibrance.schematicmetablocks.gui.GUIs;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
@@ -20,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import java.util.List;
 
 public class MetaToolItem extends Item
@@ -232,19 +235,21 @@ public class MetaToolItem extends Item
         return true;
     }
 
-    private static boolean moveRegion(World world, BlockPos worldBlockCoord, EnumFacing direction, RegionTileEntity originalTileEntity, boolean push)
+    private static boolean moveRegion(World world, BlockPos oldPos, EnumFacing direction, RegionTileEntity originalTileEntity, boolean push)
     {
         if (push)
         {
             direction = direction.getOpposite();
         }
 
-        final BlockPos newPos = worldBlockCoord.offset(direction);
+        final BlockPos newPos = oldPos.offset(direction);
 
         if (!world.isAirBlock(newPos))
         {
             return false;
         }
+
+        final RegionTileEntity oldTileEntity = RegionTileEntity.tryGetTileEntity(world, oldPos);
 
         world.setBlockState(newPos, ModBlock.blockRegion.getDefaultState());
         final RegionTileEntity newTileEntity = RegionTileEntity.tryGetTileEntity(world, newPos);
@@ -260,7 +265,12 @@ public class MetaToolItem extends Item
             Logger.info("(2/2) Linking (%s) to (%s)", newTileEntity, linkedTileEntity);
             newTileEntity.setLinkedTileEntity(linkedTileEntity);
         }
-        world.setBlockToAir(worldBlockCoord);
+
+        MinecraftForge.EVENT_BUS.post(new TileEntityEvent.Added(newTileEntity));
+        if (oldTileEntity != null) {
+            MinecraftForge.EVENT_BUS.post(new TileEntityEvent.Added(oldTileEntity));
+        }
+        world.setBlockToAir(oldPos);
 
         return true;
     }

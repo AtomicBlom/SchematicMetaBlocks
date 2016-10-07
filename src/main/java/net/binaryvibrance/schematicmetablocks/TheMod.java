@@ -37,8 +37,6 @@ public class TheMod
 
     @SidedProxy(clientSide = "net.binaryvibrance.schematicmetablocks.proxy.ClientProxy", serverSide = "net.binaryvibrance.schematicmetablocks.proxy.CommonProxy")
     public static CommonProxy proxy;
-    //public static Configuration configFile;
-    //public static boolean creatorMode = true;
 
     @Mod.EventHandler
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
@@ -53,11 +51,7 @@ public class TheMod
     @Mod.EventHandler
     public void onFMLInitialization(FMLInitializationEvent event)
     {
-
-        ModBlock.registerTileEntities();
-        proxy.setCustomRenderers();
         MinecraftForge.EVENT_BUS.register(JobProcessor.Instance);
-
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
     }
 

@@ -25,7 +25,7 @@ import java.util.Set;
 public class Rendering
 {
 
-    private static final Set<TileEntity> renderables = Sets.newHashSet();
+    private static final Set<TileEntity> renderables = Sets.newConcurrentHashSet();
 
     @SubscribeEvent
     public static void onRenderWorld(RenderWorldLastEvent event) {
