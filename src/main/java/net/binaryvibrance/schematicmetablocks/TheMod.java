@@ -46,12 +46,6 @@ public class TheMod
         CHANNEL.registerMessage(SetSchematicNameMessageHandler.class, SetSchematicNameMessage.class, 0, Side.SERVER);
 
         Settings.syncConfig(new Configuration(event.getSuggestedConfigurationFile()));
-        //syncConfig();
-        //ModBlock.init();
-        //ModItem.init();
-
-        //BlockRegistration.onBlockRegister(null);
-        //ItemRegistration.onItemRegistration(null);
         MinecraftForge.EVENT_BUS.post(new RegisterRenderingEvent());
     }
 
@@ -62,10 +56,8 @@ public class TheMod
 
         ModBlock.registerTileEntities();
         proxy.setCustomRenderers();
-        FMLCommonHandler.instance().bus().register(JobProcessor.Instance);
         MinecraftForge.EVENT_BUS.register(JobProcessor.Instance);
-        MinecraftForge.EVENT_BUS.register(WorldListener.Instance);
-        MinecraftForge.EVENT_BUS.register(SchematicSaveListener.Instance);
+
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
     }
 
@@ -81,12 +73,5 @@ public class TheMod
     {
         return true;
     }
-
-    /*public static void syncConfig() {
-        creatorMode = configFile.getBoolean("creatorMode", Configuration.CATEGORY_GENERAL, creatorMode, "Turning off Creator mode disables all the blocks and hides the creative tab");
-
-        if(configFile.hasChanged())
-            configFile.save();
-    }*/
 }
 

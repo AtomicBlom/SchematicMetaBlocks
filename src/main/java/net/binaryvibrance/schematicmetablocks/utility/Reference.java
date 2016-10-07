@@ -7,7 +7,7 @@ import net.minecraft.util.ResourceLocation;
 
 public final class Reference
 {
-    public static CreativeTabs CreativeTab = new CreativeTabs(Reference.MOD_ID)
+    public static final CreativeTabs CreativeTab = new CreativeTabs(Reference.MOD_ID)
     {
         @Override
         public Item getTabIconItem()
@@ -27,8 +27,6 @@ public final class Reference
     }
 
     public static final class Blocks {
-        //public static final String NORMAL_VARIANT = "normal";
-
         public static final ResourceLocation ExplicitAir = new ResourceLocation(MOD_ID, "blockExplicitAir");
         public static final ResourceLocation ImplicitAir = new ResourceLocation(MOD_ID, "blockImplicitAir");
         public static final ResourceLocation InteriorAirMarker = new ResourceLocation(MOD_ID, "blockInteriorAirMarker");

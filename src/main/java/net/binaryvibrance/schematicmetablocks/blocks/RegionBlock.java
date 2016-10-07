@@ -92,6 +92,13 @@ public class RegionBlock extends Block
     }
 
     @Override
+    @Deprecated
+    public boolean isFullCube(IBlockState state)
+    {
+        return false;
+    }
+
+    @Override
     public boolean hasTileEntity(IBlockState state)
     {
         return true;

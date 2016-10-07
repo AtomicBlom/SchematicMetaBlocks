@@ -45,29 +45,4 @@ public final class ModBlock
         blockNull = null;
         blockRegion = null;
     }
-
-    public static void registerTileEntities()
-    {
-        //GameRegistry.registerTileEntity(InteriorAirMarkerTileEntity.class, getTEName(blockInteriorAirMarker.NAME));
-        //GameRegistry.registerTileEntity(RegionTileEntity.class, getTEName(blockRegion.NAME));
-    }
-
-
-
-    public static void init()
-    {
-        /*blockInteriorAirMarker = new InteriorAirMarker();
-        blockImplicitAir = new ImplicitAirBlock();
-        blockExplicitAir = new ExplicitAirBlock();
-        blockOrigin = new OriginBlock();
-        blockNull = new NullBlock();
-        blockRegion = new RegionBlock();
-
-        GameRegistry.registerBlock(blockInteriorAirMarker, blockInteriorAirMarker.NAME);
-        GameRegistry.registerBlock(blockImplicitAir, blockImplicitAir.NAME);
-        GameRegistry.registerBlock(blockExplicitAir, blockExplicitAir.NAME);
-        GameRegistry.registerBlock(blockNull, blockNull.NAME);
-        GameRegistry.registerBlock(blockOrigin, blockOrigin.NAME);
-        GameRegistry.registerBlock(blockRegion, blockRegion.NAME);*/
-    }
 }

@@ -18,7 +18,7 @@ public class ExplicitAirBlock extends Block
 {
     public ExplicitAirBlock()
     {
-        super(Material.AIR);
+        super(Material.GLASS);
     }
 
     @Override
@@ -42,6 +42,13 @@ public class ExplicitAirBlock extends Block
             super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
         }
 
+    }
+
+    @Override
+    @Deprecated
+    public boolean isFullCube(IBlockState state)
+    {
+        return false;
     }
 
     @Override

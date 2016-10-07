@@ -11,6 +11,8 @@ public class SetSchematicNameMessage implements IMessage
     private BlockPos pos;
     private String schematicName;
 
+    public SetSchematicNameMessage() {}
+
     public SetSchematicNameMessage(int dimensionId, BlockPos pos, String schematicName) {
 
         this.dimensionId = dimensionId;

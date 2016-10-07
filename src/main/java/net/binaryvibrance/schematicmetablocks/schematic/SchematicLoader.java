@@ -18,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespacedDefaultedByKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
@@ -210,11 +211,13 @@ public class SchematicLoader
                         {
                             //TODO: Is this still needed?
                             //world.markBlockForUpdate(new BlockPos(x, y, z));
+
+                            world.markAndNotifyBlock(new BlockPos(x, y, z), c, event.blockState, event.blockState, 2);
+
                             final NBTTagCompound tileEntityData = schematic.getTileEntity(schematicCoord);
                             final Block block = event.blockState.getBlock();
                             if (block.hasTileEntity(event.blockState) && tileEntityData != null)
                             {
-                                MinecraftServer unused = null;
                                 TileEntity tileEntity = TileEntity.create(world, tileEntityData);
 
                                 c.addTileEntity(new BlockPos(chunkLocalX, y, chunkLocalZ), tileEntity);
@@ -251,6 +254,7 @@ public class SchematicLoader
 
         c.enqueueRelightChecks();
         c.setChunkModified();
+
     }
 
     public void renderSchematicInOneShot(ResourceLocation resource, World world, BlockPos pos, EnumFacing rotation, boolean flip)

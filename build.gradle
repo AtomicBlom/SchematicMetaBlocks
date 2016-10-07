@@ -82,8 +82,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    compile group: 'com.github.lunatrius', name: 'Schematica', version: config.minecraft_version + "-" + config.schematica_version, classifier: 'api'
-    runtime group: 'com.github.lunatrius', name: 'Schematica', version: config.minecraft_version + "-" + config.schematica_version, classifier: 'dev'
+    deobfCompile group: 'com.github.lunatrius', name: 'Schematica', version: config.minecraft_version + "-" + config.schematica_version, classifier: 'universal'
+    deobfCompile group: 'com.github.lunatrius', name: 'LunatriusCore', version: config.minecraft_version + "-" + config.lunatriuscore_version, classifier: 'universal'
+    //compile group: 'com.github.lunatrius', name: 'Schematica', version: config.minecraft_version + "-" + config.schematica_version, classifier: 'api'
+    //runtime group: 'com.github.lunatrius', name: 'Schematica', version: config.minecraft_version + "-" + config.schematica_version, classifier: 'dev'
     //runtime group: 'com.github.lunatrius', name: 'LunatriusCore', version: "1.7.10-1.1.2.20", classifier: 'dev'
 }
 

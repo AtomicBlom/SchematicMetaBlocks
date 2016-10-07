@@ -39,10 +39,4 @@ public final class ModItem
     static {
         metaToolItem = null;
     }
-
-    /*public static void init()
-    {
-        metaToolItem = new MetaToolItem();
-        GameRegistry.registerItem(metaToolItem, MetaToolItem.NAME);
-    }*/
 }

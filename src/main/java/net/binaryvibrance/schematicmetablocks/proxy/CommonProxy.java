@@ -9,11 +9,6 @@ import java.io.IOException;
 
 public class CommonProxy
 {
-    public void setCustomRenderers()
-    {
-
-    }
-
     public File getDataDirectory() {
         final MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
         final File file = server.getFile(".");

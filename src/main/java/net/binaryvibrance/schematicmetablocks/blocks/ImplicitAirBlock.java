@@ -73,6 +73,6 @@ public class ImplicitAirBlock extends Block
     @Override
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer)
     {
-        return layer == BlockRenderLayer.CUTOUT_MIPPED;
+        return layer == BlockRenderLayer.CUTOUT;
     }
 }

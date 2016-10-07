@@ -4,7 +4,6 @@ import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.config.Settings;
 import net.binaryvibrance.schematicmetablocks.events.RegisterRenderingEvent;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
-import net.binaryvibrance.schematicmetablocks.render.RegionTESR;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.binaryvibrance.schematicmetablocks.utility.Localization;

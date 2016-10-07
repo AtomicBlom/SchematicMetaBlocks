@@ -9,18 +9,20 @@ import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.library.Mods;
 import net.binaryvibrance.schematicmetablocks.utility.NBTUtils;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Mod.EventBusSubscriber
 public class SchematicSaveListener
 {
-    public static final SchematicSaveListener Instance = new SchematicSaveListener();
-    private SchematicContext context;
+    private static SchematicContext context;
 
     private SchematicSaveListener()
     {
@@ -29,7 +31,7 @@ public class SchematicSaveListener
 
     @SubscribeEvent
     @Optional.Method(modid = Mods.Schematica)
-    public void OnSchematicCaptured(PostSchematicCaptureEvent event)
+    public static void OnSchematicCaptured(PostSchematicCaptureEvent event)
     {
 
         Logger.info("Schematic captured, changing weather pattern.");
@@ -51,7 +53,7 @@ public class SchematicSaveListener
                 for (int y = 0; y < height; ++y)
                 {
                     mutableBlockPos.setPos(x, y, z);
-                    final IBlockState block = schematic.getBlockState(mutableBlockPos);
+                    final Block block = schematic.getBlockState(mutableBlockPos).getBlock();
                     if (block instanceof ExplicitAirBlock)
                     {
                         schematic.setBlockState(mutableBlockPos, Blocks.AIR.getDefaultState());
@@ -85,7 +87,7 @@ public class SchematicSaveListener
 
     @SubscribeEvent
     @Optional.Method(modid = Mods.Schematica)
-    public void OnSchematicSaving(PreSchematicSaveEvent event)
+    public static void OnSchematicSaving(PreSchematicSaveEvent event)
     {
 
         final NBTTagCompound extendedMetadata = event.extendedMetadata;
@@ -102,7 +104,7 @@ public class SchematicSaveListener
         }
     }
 
-    class SchematicContext
+    static class SchematicContext
     {
         BlockPos origin;
 

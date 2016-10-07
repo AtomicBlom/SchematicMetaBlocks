@@ -1,37 +1,35 @@
 package net.binaryvibrance.schematicmetablocks.jobs;
 
-import com.google.common.base.Function;
 import net.binaryvibrance.schematicmetablocks.Logger;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.function.Function;
 
+@Mod.EventBusSubscriber
 public class JobProcessor
 {
     public static JobProcessor Instance = new JobProcessor();
     private final Thread _thread;
     private final Object jobContextSwitchLock = new Object();
-    IJob currentBackgroundJob;
-    private BlockingQueue<IJob> scheduledBackgroundJobs = new LinkedBlockingDeque<IJob>();
-    private ConcurrentLinkedQueue<IJob> scheduledTickJobs = new ConcurrentLinkedQueue<IJob>();
+    private IJob currentBackgroundJob = null;
+    private BlockingQueue<IJob> scheduledBackgroundJobs = new LinkedBlockingDeque<>();
+    private Queue<IJob> scheduledTickJobs = new ConcurrentLinkedQueue<>();
 
     private JobProcessor()
     {
         _thread = new Thread(this::ProcessBackgroundJobs);
         _thread.start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
-            public void run()
-            {
-                _thread.interrupt();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(_thread::interrupt));
     }
 
     @SubscribeEvent
@@ -40,8 +38,8 @@ public class JobProcessor
     {
         synchronized (jobContextSwitchLock)
         {
-            LinkedList<IJob> jobsToRemove = new LinkedList<>();
-            for (IJob job : scheduledBackgroundJobs)
+            final Deque<IJob> jobsToRemove = new LinkedList<>();
+            for (final IJob job : scheduledBackgroundJobs)
             {
                 if (job instanceof IWorldJob)
                 {
@@ -65,19 +63,20 @@ public class JobProcessor
 
     private void ProcessBackgroundJobs()
     {
-        IJob chunkToProcess;
+        IJob job;
         try
         {
             while (true)
             {
-                chunkToProcess = scheduledBackgroundJobs.take();
+                job = scheduledBackgroundJobs.take();
                 synchronized (jobContextSwitchLock)
                 {
-                    currentBackgroundJob = chunkToProcess;
+                    currentBackgroundJob = job;
                 }
-                if (chunkToProcess != null)
+                if (job != null)
                 {
-                    chunkToProcess.start();
+                    Logger.info("Starting Background Job %s", job.getClass().getName());
+                    job.start();
                 }
             }
         } catch (InterruptedException e)
@@ -85,7 +84,6 @@ public class JobProcessor
 
         }
     }
-    //private Queue<IJob> unscheduledBackgroundJobs = new LinkedList<IJob>();
 
     private void scheduleBackgroundJob(IJob jobToProcess)
     {
@@ -96,7 +94,7 @@ public class JobProcessor
                 currentBackgroundJob.notifyUpdatedJob();
             }
 
-            for (IJob job : scheduledBackgroundJobs)
+            for (final IJob job : scheduledBackgroundJobs)
             {
                 if (jobToProcess.represents(job))
                 {
@@ -121,7 +119,8 @@ public class JobProcessor
         int jobQuota = 32;
         while (!scheduledTickJobs.isEmpty() && --jobQuota > 0)
         {
-            IJob job = scheduledTickJobs.poll();
+            final IJob job = scheduledTickJobs.poll();
+            Logger.info("Starting World Tick Job %s", job.getClass().getName());
             job.start();
         }
     }

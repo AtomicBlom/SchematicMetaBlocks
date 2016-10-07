@@ -6,16 +6,16 @@ import net.binaryvibrance.schematicmetablocks.jobs.JobType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Mod.EventBusSubscriber
 public class WorldListener
 {
-    public static final WorldListener Instance = new WorldListener();
-
     private WorldListener() {}
 
     @SubscribeEvent
-    public void onBlockChanged(BlockEvent.PlaceEvent blockPlacedEvent)
+    public static void onBlockChanged(BlockEvent.PlaceEvent blockPlacedEvent)
     {
         World world = blockPlacedEvent.getBlockSnapshot().getWorld();
         final BlockPos pos = blockPlacedEvent.getPos();
@@ -24,7 +24,7 @@ public class WorldListener
     }
 
     @SubscribeEvent
-    public void onBlockBroken(BlockEvent.BreakEvent blockBrokenEvent)
+    public static void onBlockBroken(BlockEvent.BreakEvent blockBrokenEvent)
     {
         World world = blockBrokenEvent.getWorld();
         final BlockPos pos = blockBrokenEvent.getPos();

@@ -6,9 +6,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-/**
- * Created by Steven on 22/05/2015.
- */
 public class RenderWorldJob implements IJob {
     private final SchematicLoader schematicLoader;
     private final ResourceLocation resource;

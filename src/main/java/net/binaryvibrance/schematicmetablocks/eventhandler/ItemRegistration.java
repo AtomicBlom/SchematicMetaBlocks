@@ -1,8 +1,9 @@
-package net.binaryvibrance.schematicmetablocks.events;
+package net.binaryvibrance.schematicmetablocks.eventhandler;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import net.binaryvibrance.schematicmetablocks.config.Settings;
+import net.binaryvibrance.schematicmetablocks.events.RegisterRenderingEvent;
 import net.binaryvibrance.schematicmetablocks.items.MetaToolItem;
 import net.binaryvibrance.schematicmetablocks.utility.Localization;
 import net.binaryvibrance.schematicmetablocks.utility.Reference;
@@ -58,7 +59,7 @@ public class ItemRegistration
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public static void registerRendering(RegisterRendering event) {
+    public static void registerRendering(RegisterRenderingEvent event) {
         itemRenderingList.forEach(item -> ModelLoader.setCustomModelResourceLocation(
             item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory")
         ));

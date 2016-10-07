@@ -22,7 +22,7 @@ public class LoadSchematicCommand extends CommandBase
     }
 
     @Override
-    public String getCommandUsage(ICommandSender p_71518_1_)
+    public String getCommandUsage(ICommandSender sender)
     {
         return "/smbLoadSchematic <schematic> [x] [y] [z]";
     }
@@ -56,13 +56,13 @@ public class LoadSchematicCommand extends CommandBase
             z = parseCoordinate(z, args[3], false).getResult();
         }
 
-        SchematicLoader loader = new SchematicLoader();
+        final SchematicLoader loader = new SchematicLoader();
 
         if (!filename.endsWith(".schematic")) {
             filename += ".schematic";
         }
 
-        ResourceLocation schematicLocation = loader.loadSchematic(new File(TheMod.proxy.getDataDirectory(), "/Schematics/" + filename));
+        final ResourceLocation schematicLocation = loader.loadSchematic(new File(TheMod.proxy.getDataDirectory(), "/Schematics/" + filename));
         loader.renderSchematicInOneShot(schematicLocation, sender.getEntityWorld(), new BlockPos((int) x, (int) y, (int) z), EnumFacing.NORTH, false);
         sender.addChatMessage(new TextComponentString("Rendered schematic " + filename));
     }
