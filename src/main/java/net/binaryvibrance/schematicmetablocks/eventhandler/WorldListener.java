@@ -1,4 +1,4 @@
-package net.binaryvibrance.schematicmetablocks.events;
+package net.binaryvibrance.schematicmetablocks.eventhandler;
 
 import net.binaryvibrance.schematicmetablocks.jobs.ChunkToProcess;
 import net.binaryvibrance.schematicmetablocks.jobs.JobProcessor;

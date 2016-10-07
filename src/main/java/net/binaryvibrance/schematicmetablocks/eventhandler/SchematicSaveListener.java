@@ -1,4 +1,4 @@
-package net.binaryvibrance.schematicmetablocks.events;
+package net.binaryvibrance.schematicmetablocks.eventhandler;
 
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.api.event.DuplicateMappingException;
