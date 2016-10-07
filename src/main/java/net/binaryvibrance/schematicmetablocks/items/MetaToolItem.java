@@ -126,7 +126,9 @@ public class MetaToolItem extends Item
         if (coords != null)
         {
             final BlockPos worldBlockCoord = NBTUtils.readBlockPos(coords);
-            tooltip.add(String.format("(%d, %d, %d)", worldBlockCoord.getX(), worldBlockCoord.getY(), worldBlockCoord.getZ()));
+            if (worldBlockCoord != null) {
+                tooltip.add(String.format("(%d, %d, %d)", worldBlockCoord.getX(), worldBlockCoord.getY(), worldBlockCoord.getZ()));
+            }
         }
     }
 

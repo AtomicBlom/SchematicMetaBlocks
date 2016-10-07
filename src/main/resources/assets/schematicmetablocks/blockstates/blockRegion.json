@@ -7,6 +7,14 @@
 	},
 	"variants": {
 		"normal": [{}],
-		"inventory": [{}]
+		"inventory": [{}],
+		"valid": {
+			"true": {
+				"textures": { "all": "schematicmetablocks:blocks/blockRegion" }
+			},
+			"false": {
+				"textures": { "all": "schematicmetablocks:blocks/blockRegion-bad" }
+			}
+		}
 	}
 }

@@ -2,15 +2,21 @@ package net.binaryvibrance.schematicmetablocks.events;
 
 import net.binaryvibrance.schematicmetablocks.blocks.*;
 import net.binaryvibrance.schematicmetablocks.config.Settings;
+import net.binaryvibrance.schematicmetablocks.library.ModBlock;
 import net.binaryvibrance.schematicmetablocks.render.RegionTESR;
 import net.binaryvibrance.schematicmetablocks.tileentity.InteriorAirMarkerTileEntity;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.binaryvibrance.schematicmetablocks.utility.Localization;
 import net.binaryvibrance.schematicmetablocks.utility.Reference;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.pattern.BlockStateMatcher;
+import net.minecraft.client.renderer.block.statemap.BlockStateMapper;
+import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -83,5 +89,7 @@ public class BlockRegistration
     @SideOnly(Side.CLIENT)
     public static void registerRendering(RegisterRendering event) {
         ClientRegistry.bindTileEntitySpecialRenderer(RegionTileEntity.class, new RegionTESR());
+
+        ModelLoader.setCustomStateMapper(ModBlock.blockRegion, new StateMap.Builder().ignore(RegionBlock.IS_PRIMARY_RENDERER).build());
     }
 }

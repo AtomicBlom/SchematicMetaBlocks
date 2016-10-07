@@ -3,6 +3,9 @@ package net.binaryvibrance.schematicmetablocks.blocks;
 import net.binaryvibrance.schematicmetablocks.tileentity.RegionTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,15 +13,48 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class RegionBlock extends Block
 {
+    public static final PropertyBool IS_VALID = PropertyBool.create("valid");
+
+    public static final PropertyBool IS_PRIMARY_RENDERER = PropertyBool.create("is_primary_renderer");
+
     public RegionBlock()
     {
         super(Material.REDSTONE_LIGHT);
+
+        this.setDefaultState(
+                this.blockState.getBaseState()
+                    .withProperty(IS_VALID, false)
+                        .withProperty(IS_PRIMARY_RENDERER, false)
+        );
+    }
+
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, IS_PRIMARY_RENDERER, IS_VALID);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState();
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return 0;
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        RegionTileEntity regionTileEntity = RegionTileEntity.tryGetTileEntity(worldIn, pos);
+        return state.withProperty(IS_VALID, regionTileEntity != null && regionTileEntity.isPaired())
+                .withProperty(IS_PRIMARY_RENDERER, regionTileEntity != null && regionTileEntity.isRenderBlock());
     }
 
     @Override
