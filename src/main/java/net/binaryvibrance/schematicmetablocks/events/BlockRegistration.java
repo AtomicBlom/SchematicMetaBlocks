@@ -88,7 +88,7 @@ public class BlockRegistration
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public static void registerRendering(RegisterRendering event) {
-        ClientRegistry.bindTileEntitySpecialRenderer(RegionTileEntity.class, new RegionTESR());
+        //ClientRegistry.bindTileEntitySpecialRenderer(RegionTileEntity.class, new RegionTESR());
 
         ModelLoader.setCustomStateMapper(ModBlock.blockRegion, new StateMap.Builder().ignore(RegionBlock.IS_PRIMARY_RENDERER).build());
     }

@@ -26,7 +26,7 @@ public class RegionBlock extends Block
 
     public RegionBlock()
     {
-        super(Material.REDSTONE_LIGHT);
+        super(Material.GLASS);
 
         this.setDefaultState(
                 this.blockState.getBaseState()
@@ -41,6 +41,7 @@ public class RegionBlock extends Block
     }
 
     @Override
+    @Deprecated
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState();
     }
@@ -51,6 +52,7 @@ public class RegionBlock extends Block
     }
 
     @Override
+    @Deprecated
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
         RegionTileEntity regionTileEntity = RegionTileEntity.tryGetTileEntity(worldIn, pos);
         return state.withProperty(IS_VALID, regionTileEntity != null && regionTileEntity.isPaired())
